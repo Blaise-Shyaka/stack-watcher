@@ -152,7 +152,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   var K = { version: "sw.version", follows: "sw.follows", seen: "sw.seen", cache: "sw.cache" };
   var HOUR = 3600 * 1000, DAY = 24 * HOUR;
   var STACK_TTL = HOUR, CATALOG_TTL = 6 * HOUR;
-  var POPULAR = ["python", "typescript", "react", "postgresql", "kubernetes", "temporal", "go", "docker"];
+  var POPULAR = ["python", "typescript", "react", "nextjs", "postgresql", "kubernetes", "temporal", "docker"];
   var GROUPS = [
     { id: "act", title: "Act on it" },
     { id: "notable", title: "Notable releases" },
@@ -193,6 +193,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   if (!Array.isArray(state.follows)) state.follows = [];
   if (!state.cache || typeof state.cache !== "object") state.cache = { catalog: null, stacks: {} };
   if (!state.cache.stacks) state.cache.stacks = {};
+  state.onboarding = !state.follows.length;
 
   function saveFollows() { save(K.follows, state.follows); }
   function saveSeen() { save(K.seen, state.seen); }
@@ -393,9 +394,15 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     if (picks.length) {
       body.appendChild(h("p", { class: "sw-label" }, "Or start with a popular one"));
       body.appendChild(h("div", { class: "sw-popular" }, picks.map(function (s) {
-        return h("button", { class: "sw-chip", "aria-pressed": "false", "aria-label": "Follow " + s.name,
-          onclick: function () { toggleFollow(s.id); } }, icon("plus", 16), s.name);
+        var on = state.follows.indexOf(s.id) >= 0;
+        return h("button", { class: "sw-chip", "aria-pressed": String(on), "aria-label": (on ? "Remove " : "Add ") + s.name,
+          onclick: function () { toggleFollow(s.id); } }, icon(on ? "check" : "plus", 16), s.name);
       })));
+      if (state.follows.length) {
+        body.appendChild(h("p", { class: "sw-foot", style: "margin-bottom: 12px" }, "Following " + state.follows.length + ". Your first briefing covers the last 14 days."));
+        body.appendChild(h("div", { style: "padding: 0 16px 32px" },
+          h("button", { class: "cc-btn cc-block", onclick: function () { state.onboarding = false; renderToday(); } }, "Show my briefing")));
+      }
     } else if (state.catalogStatus === "error") {
       body.appendChild(h("p", { class: "sw-foot" }, "The list of stacks couldn't be loaded. Check your connection, then try again."));
     }
@@ -423,7 +430,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     var dateText = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
     renderBanner();
 
-    if (!state.follows.length) {
+    if (!state.follows.length || state.onboarding) {
       sub.textContent = dateText;
       renderFirstRun(body);
       fillIcons(body);
@@ -509,6 +516,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   // --- detail ------------------------------------------------------------------------
   function whyText(item, stack) {
     if (item.kind === "security") return "You follow " + stack.name + ", and this advisory affects one of its packages.";
+    if (item.badges.indexOf("security") >= 0) return "You follow " + stack.name + ". This " + (item.kind === "release" ? "release fixes" : "post is about") + " a security issue, so it comes first.";
     if (item.group === "act") return "You follow " + stack.name + ". Breaking changes and removals always make your briefing.";
     if (item.badges.indexOf("first-stable") >= 0) return "You follow " + stack.name + ". A first stable release always makes your briefing.";
     if (item.badges.indexOf("new-project") >= 0) return "You follow " + stack.name + ". A new project's first release always makes your briefing.";
@@ -592,7 +600,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
         h("span", { class: "sw-row-name" }, s.name),
         h("span", { class: "sw-meta" }, kinds.join(" · "))),
       h("button", { class: "sw-follow", "aria-pressed": String(on), "aria-label": (on ? "Unfollow " : "Follow ") + s.name,
-        onclick: function () { toggleFollow(s.id); } }, on ? "Following" : "Follow")));
+        onclick: function () { state.onboarding = false; toggleFollow(s.id); } }, on ? "Following" : "Follow")));
   }
 
   function matches(s, q) {

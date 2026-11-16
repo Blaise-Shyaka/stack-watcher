@@ -200,7 +200,8 @@
       },
       {
         "do": "tap",
-        "label": "Follow Temporal"
+        "role": "button",
+        "name": "Follow Temporal"
       },
       {
         "do": "wait",
@@ -394,7 +395,7 @@
     "steps": [
       {
         "do": "tap",
-        "label": "Follow Temporal"
+        "label": "Add Temporal"
       },
       {
         "do": "wait",
@@ -407,7 +408,8 @@
       },
       {
         "do": "tap",
-        "label": "Follow Next.js"
+        "role": "button",
+        "name": "Follow Next.js"
       },
       {
         "do": "wait",
@@ -635,11 +637,15 @@
     "steps": [
       {
         "do": "tap",
-        "label": "Follow Temporal"
+        "label": "Add Temporal"
       },
       {
         "do": "wait",
         "ms": 400
+      },
+      {
+        "do": "tap",
+        "text": "Show my briefing"
       },
       {
         "do": "tap",
@@ -1074,7 +1080,8 @@
       },
       {
         "do": "tap",
-        "label": "Follow Temporal"
+        "role": "button",
+        "name": "Follow Temporal"
       },
       {
         "do": "wait",
@@ -1098,6 +1105,219 @@
       {
         "expect": "see",
         "text": "Following 1 of 2"
+      }
+    ]
+  },
+  {
+    "id": "T-7",
+    "kind": "behaviour",
+    "title": "Pick several popular stacks on first open",
+    "proves": [
+      "J-1.4"
+    ],
+    "clock": "2026-09-05T08:00:00Z",
+    "responses": [
+      {
+        "site": "raw.githubusercontent.com",
+        "path": "/Blaise-Shyaka/stack-watcher/feed/catalog.json",
+        "body": {
+          "version": 1,
+          "generatedAt": "2026-09-05T06:17:00Z",
+          "categories": [
+            {
+              "id": "frontend",
+              "name": "Frontend"
+            },
+            {
+              "id": "workflows",
+              "name": "Workflows and messaging"
+            }
+          ],
+          "stacks": [
+            {
+              "id": "nextjs",
+              "name": "Next.js",
+              "category": "frontend",
+              "aliases": [
+                "next"
+              ],
+              "mono": "N",
+              "hue": 240,
+              "kinds": [
+                "blog",
+                "release",
+                "security"
+              ]
+            },
+            {
+              "id": "temporal",
+              "name": "Temporal",
+              "category": "workflows",
+              "aliases": [
+                "temporalio",
+                "temporal.io"
+              ],
+              "mono": "T",
+              "hue": 265,
+              "kinds": [
+                "blog",
+                "release",
+                "security"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "site": "raw.githubusercontent.com",
+        "path": "/Blaise-Shyaka/stack-watcher/feed/stacks/temporal.json",
+        "body": {
+          "version": 1,
+          "id": "temporal",
+          "name": "Temporal",
+          "generatedAt": "2026-09-05T06:17:00Z",
+          "items": [
+            {
+              "id": "t1",
+              "kind": "release",
+              "group": "notable",
+              "score": 74,
+              "title": "Temporal Rust SDK 1.0.0",
+              "summary": "Remove public preview warnings; Stabilize the Workflow API.",
+              "url": "https://github.com/temporalio/sdk-rust/releases/tag/v1.0.0",
+              "source": "Rust SDK",
+              "official": true,
+              "badges": [
+                "first-stable",
+                "official"
+              ],
+              "severity": null,
+              "cve": null,
+              "publishedAt": "2026-09-04T17:02:00Z",
+              "firstSeenAt": "2026-09-04T17:02:00Z"
+            },
+            {
+              "id": "t2",
+              "kind": "blog",
+              "group": "read",
+              "score": 50,
+              "title": "Writing your first Workflow in Rust",
+              "summary": "A walkthrough of Workers, Activities and testing with the new SDK.",
+              "url": "https://temporal.io/blog/rust-first-workflow",
+              "source": "Official blog",
+              "official": true,
+              "badges": [
+                "official"
+              ],
+              "severity": null,
+              "cve": null,
+              "publishedAt": "2026-09-04T20:00:00Z",
+              "firstSeenAt": "2026-09-04T20:00:00Z"
+            },
+            {
+              "id": "t3",
+              "kind": "release",
+              "group": "routine",
+              "score": 20,
+              "title": "Temporal Go SDK 1.36.2",
+              "summary": "Fix a race in worker shutdown.",
+              "url": "https://github.com/temporalio/sdk-go/releases/tag/v1.36.2",
+              "source": "Go SDK",
+              "official": true,
+              "badges": [
+                "patch",
+                "official"
+              ],
+              "severity": null,
+              "cve": null,
+              "publishedAt": "2026-09-03T10:00:00Z",
+              "firstSeenAt": "2026-09-03T10:00:00Z"
+            }
+          ]
+        }
+      },
+      {
+        "site": "raw.githubusercontent.com",
+        "path": "/Blaise-Shyaka/stack-watcher/feed/stacks/nextjs.json",
+        "body": {
+          "version": 1,
+          "id": "nextjs",
+          "name": "Next.js",
+          "generatedAt": "2026-09-05T06:17:00Z",
+          "items": [
+            {
+              "id": "n1",
+              "kind": "security",
+              "group": "act",
+              "score": 92,
+              "title": "Cache poisoning in middleware rewrites",
+              "summary": "Affects next >= 15.0.0, < 15.2.4. Fixed in 15.2.4.",
+              "url": "https://github.com/advisories/GHSA-0000-0000-0000",
+              "source": "GitHub Advisory Database",
+              "official": true,
+              "badges": [
+                "security"
+              ],
+              "severity": "high",
+              "cve": "CVE-2026-12345",
+              "publishedAt": "2026-09-04T09:00:00Z",
+              "firstSeenAt": "2026-09-04T09:00:00Z"
+            },
+            {
+              "id": "n2",
+              "kind": "release",
+              "group": "routine",
+              "score": 35,
+              "title": "Next.js 15.6.0",
+              "summary": "Faster dev builds.",
+              "url": "https://github.com/vercel/next.js/releases/tag/v15.6.0",
+              "source": "Release",
+              "official": true,
+              "badges": [
+                "minor",
+                "official"
+              ],
+              "severity": null,
+              "cve": null,
+              "publishedAt": "2026-09-02T10:00:00Z",
+              "firstSeenAt": "2026-09-02T10:00:00Z"
+            }
+          ]
+        }
+      }
+    ],
+    "steps": [
+      {
+        "do": "tap",
+        "label": "Add Temporal"
+      },
+      {
+        "do": "wait",
+        "ms": 300
+      },
+      {
+        "do": "tap",
+        "label": "Add Next.js"
+      },
+      {
+        "do": "wait",
+        "ms": 300
+      },
+      {
+        "expect": "see",
+        "text": "Following 2"
+      },
+      {
+        "do": "tap",
+        "text": "Show my briefing"
+      },
+      {
+        "expect": "see",
+        "text": "Act on it"
+      },
+      {
+        "expect": "see",
+        "text": "Temporal Rust SDK 1.0.0"
       }
     ]
   }
