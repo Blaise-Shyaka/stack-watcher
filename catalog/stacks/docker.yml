@@ -1,0 +1,16 @@
+id: docker
+name: Docker
+category: cloud
+aliases: [moby, docker engine, docker compose, containers]
+mono: Dk
+hue: 206
+homepage: https://www.docker.com
+sources:
+  - kind: blog
+    url: https://www.docker.com/blog/feed/
+  - kind: release
+    url: https://github.com/moby/moby/releases.atom
+    label: Engine
+  - kind: release
+    url: https://github.com/docker/compose/releases.atom
+    label: Compose

@@ -1,0 +1,15 @@
+id: nats
+name: NATS
+category: workflows
+aliases: [nats.io, jetstream]
+mono: NA
+hue: 160
+homepage: https://nats.io
+sources:
+  - kind: release
+    url: https://github.com/nats-io/nats-server/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://nats.io/blog/index.xml
+  - kind: security
+    advisories: { ecosystem: go, packages: [github.com/nats-io/nats-server/v2] }

@@ -1,0 +1,60 @@
+name: Catalog check
+
+# Validates the catalog and runs the tests; for stacks that changed, fetches their
+# sources live and shows the latest items in the job summary.
+on:
+  pull_request:
+    paths: ["catalog/**", "pipeline/**", "tests/**"]
+  push:
+    paths: ["catalog/**", "pipeline/**", "tests/**"]
+  workflow_dispatch:
+    inputs:
+      stacks:
+        description: "Stack ids to fetch live, separated by spaces, or all"
+        default: "all"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements-dev.txt
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Catalog schema
+        run: python -m pipeline.validate catalog
+
+      - name: Live check of changed stacks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT: ${{ github.event_name }}
+          INPUT_STACKS: ${{ inputs.stacks }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            ids="$INPUT_STACKS"
+          elif [ "$EVENT" = "pull_request" ]; then
+            ids=$(git diff --name-only "origin/$BASE_REF...HEAD" -- catalog/stacks | xargs -r -n1 basename | sed 's/\.yml$//')
+          elif [ -z "$BEFORE" ] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            ids="all"
+          else
+            ids=$(git diff --name-only "$BEFORE" HEAD -- catalog/stacks | xargs -r -n1 basename | sed 's/\.yml$//')
+          fi
+          if [ -z "$ids" ]; then
+            echo "No stack files changed."
+            exit 0
+          fi
+          python -m pipeline.validate catalog --fetch $ids --summary "$GITHUB_STEP_SUMMARY"

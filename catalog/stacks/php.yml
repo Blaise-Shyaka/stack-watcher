@@ -1,0 +1,15 @@
+id: php
+name: PHP
+category: languages
+aliases: [php8]
+mono: Ph
+hue: 236
+homepage: https://www.php.net
+sources:
+  - kind: release
+    url: https://www.php.net/releases/feed.php
+    scheme: minor
+  - kind: blog
+    url: https://www.php.net/feed.atom
+    label: PHP news
+    scheme: minor

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+  <title>Temporal blog</title><link>https://temporal.io/blog</link><description>Posts</description>
+  <item>
+    <title>Writing your first Workflow in Rust</title>
+    <link>https://temporal.io/blog/rust-first-workflow</link>
+    <guid>https://temporal.io/blog/rust-first-workflow</guid>
+    <pubDate>Fri, 05 Sep 2026 08:00:00 GMT</pubDate>
+    <description>&lt;p&gt;A walkthrough of Workers, Activities and testing with the new SDK. It covers setup end to end. More text follows here that should not appear.&lt;/p&gt;</description>
+  </item>
+  <item>
+    <title>Deprecating the legacy visibility API</title>
+    <link>https://temporal.io/blog/deprecating-legacy-visibility</link>
+    <pubDate>Wed, 03 Sep 2026 08:00:00 GMT</pubDate>
+    <description>The old API goes away next year.</description>
+  </item>
+  <item>
+    <title>An old post</title>
+    <link>https://temporal.io/blog/old</link>
+    <pubDate>Mon, 02 Jun 2026 08:00:00 GMT</pubDate>
+    <description>Too old for the window.</description>
+  </item>
+</channel></rss>

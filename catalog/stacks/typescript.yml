@@ -1,0 +1,14 @@
+id: typescript
+name: TypeScript
+category: languages
+aliases: [ts, tsc]
+mono: TS
+hue: 214
+homepage: https://www.typescriptlang.org
+sources:
+  - kind: blog
+    url: https://devblogs.microsoft.com/typescript/feed/
+    scheme: minor
+  - kind: release
+    url: https://github.com/microsoft/TypeScript/releases.atom
+    scheme: minor

@@ -1,0 +1,14 @@
+id: openai
+name: OpenAI
+category: ai
+aliases: [openai api, chatgpt, gpt]
+mono: OA
+hue: 160
+homepage: https://openai.com
+sources:
+  - kind: blog
+    url: https://openai.com/news/rss.xml
+    label: OpenAI news
+  - kind: release
+    url: https://github.com/openai/openai-python/releases.atom
+    label: Python SDK

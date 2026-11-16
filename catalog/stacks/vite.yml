@@ -1,0 +1,17 @@
+id: vite
+name: Vite
+category: frontend
+aliases: [vitejs, vite.dev]
+mono: Vi
+hue: 268
+homepage: https://vite.dev
+sources:
+  - kind: release
+    url: https://github.com/vitejs/vite/releases.atom
+    title_match: '^v\d'
+    scheme: minor
+  - kind: blog
+    url: https://vite.dev/blog.rss
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [vite] }

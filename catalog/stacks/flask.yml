@@ -1,0 +1,17 @@
+id: flask
+name: Flask
+category: backend
+aliases: [pallets, werkzeug]
+mono: Fk
+hue: 200
+homepage: https://flask.palletsprojects.com
+sources:
+  - kind: release
+    url: https://github.com/pallets/flask/releases.atom
+    scheme: minor
+  - kind: release
+    url: https://github.com/pallets/werkzeug/releases.atom
+    label: Werkzeug
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: pip, packages: [flask, werkzeug, jinja2] }

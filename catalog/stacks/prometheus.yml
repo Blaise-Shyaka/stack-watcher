@@ -1,0 +1,15 @@
+id: prometheus
+name: Prometheus
+category: cloud
+aliases: [promql, alertmanager]
+mono: Pm
+hue: 16
+homepage: https://prometheus.io
+sources:
+  - kind: release
+    url: https://github.com/prometheus/prometheus/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://prometheus.io/blog/feed.xml
+  - kind: security
+    advisories: { ecosystem: go, packages: [github.com/prometheus/prometheus] }

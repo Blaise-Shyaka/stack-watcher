@@ -1,0 +1,20 @@
+id: phoenix
+name: Phoenix
+category: backend
+aliases: [elixir, liveview, phoenix framework]
+mono: Px
+hue: 20
+homepage: https://www.phoenixframework.org
+sources:
+  - kind: release
+    url: https://github.com/phoenixframework/phoenix/releases.atom
+    scheme: minor
+  - kind: release
+    url: https://github.com/phoenixframework/phoenix_live_view/releases.atom
+    label: LiveView
+    scheme: minor
+  - kind: blog
+    url: https://elixir-lang.org/atom.xml
+    label: Elixir blog
+  - kind: security
+    advisories: { ecosystem: erlang, packages: [phoenix, phoenix_live_view, plug] }

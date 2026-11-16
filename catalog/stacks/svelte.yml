@@ -1,0 +1,19 @@
+id: svelte
+name: Svelte
+category: frontend
+aliases: [sveltekit, svelte kit]
+mono: Sv
+hue: 12
+homepage: https://svelte.dev
+sources:
+  - kind: blog
+    url: https://svelte.dev/blog/rss.xml
+  - kind: release
+    url: https://github.com/sveltejs/svelte/releases.atom
+    title_match: '^svelte@'
+  - kind: release
+    url: https://github.com/sveltejs/kit/releases.atom
+    label: SvelteKit
+    title_match: '^@sveltejs/kit@'
+  - kind: security
+    advisories: { ecosystem: npm, packages: [svelte, "@sveltejs/kit"] }

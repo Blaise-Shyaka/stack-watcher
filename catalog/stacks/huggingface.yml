@@ -1,0 +1,16 @@
+id: huggingface
+name: Hugging Face
+category: ai
+aliases: [transformers, hf, hugging face hub]
+mono: HF
+hue: 44
+homepage: https://huggingface.co
+sources:
+  - kind: blog
+    url: https://huggingface.co/blog/feed.xml
+  - kind: release
+    url: https://github.com/huggingface/transformers/releases.atom
+    label: Transformers
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: pip, packages: [transformers, huggingface-hub] }

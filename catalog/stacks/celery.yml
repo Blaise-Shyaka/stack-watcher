@@ -1,0 +1,13 @@
+id: celery
+name: Celery
+category: workflows
+aliases: [celery task queue]
+mono: Ce
+hue: 95
+homepage: https://docs.celeryq.dev
+sources:
+  - kind: release
+    url: https://github.com/celery/celery/releases.atom
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: pip, packages: [celery] }

@@ -1,0 +1,16 @@
+id: airflow
+name: Apache Airflow
+category: workflows
+aliases: [airflow, dags]
+mono: Af
+hue: 175
+homepage: https://airflow.apache.org
+sources:
+  - kind: release
+    url: https://github.com/apache/airflow/releases.atom
+    title_match: '^Apache Airflow \d'
+    scheme: minor
+  - kind: blog
+    url: https://airflow.apache.org/blog/index.xml
+  - kind: security
+    advisories: { ecosystem: pip, packages: [apache-airflow] }

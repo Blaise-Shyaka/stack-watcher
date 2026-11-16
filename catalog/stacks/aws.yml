@@ -1,0 +1,14 @@
+id: aws
+name: AWS
+category: cloud
+aliases: [amazon web services, amazon aws]
+mono: AWS
+hue: 32
+homepage: https://aws.amazon.com
+sources:
+  - kind: blog
+    url: https://aws.amazon.com/blogs/aws/feed/
+    label: AWS News Blog
+  - kind: security
+    url: https://aws.amazon.com/security/security-bulletins/rss/feed/
+    label: Security bulletins

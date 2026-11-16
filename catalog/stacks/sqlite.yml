@@ -1,0 +1,12 @@
+id: sqlite
+name: SQLite
+category: data
+aliases: [sqlite3]
+mono: SQ
+hue: 210
+homepage: https://sqlite.org
+sources:
+  - kind: release
+    url: https://github.com/sqlite/sqlite/tags.atom
+    title_match: '^version-3\.'
+    scheme: minor

@@ -1,0 +1,17 @@
+id: terraform
+name: Terraform
+category: cloud
+aliases: [hashicorp terraform, tf, hcl]
+mono: Tf
+hue: 262
+homepage: https://www.terraform.io
+sources:
+  - kind: release
+    url: https://github.com/hashicorp/terraform/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://www.hashicorp.com/blog/feed.xml
+    label: HashiCorp blog
+    match: [Terraform]
+  - kind: security
+    advisories: { ecosystem: go, packages: [github.com/hashicorp/terraform] }

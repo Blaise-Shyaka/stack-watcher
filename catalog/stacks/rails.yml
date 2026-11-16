@@ -1,0 +1,17 @@
+id: rails
+name: Ruby on Rails
+category: backend
+aliases: [rails, ror]
+mono: RR
+hue: 356
+homepage: https://rubyonrails.org
+sources:
+  - kind: blog
+    url: https://rubyonrails.org/feed.xml
+    label: Rails blog
+    scheme: minor
+  - kind: release
+    url: https://github.com/rails/rails/releases.atom
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: rubygems, packages: [rails, actionpack, activerecord, activesupport, actionview, activestorage] }

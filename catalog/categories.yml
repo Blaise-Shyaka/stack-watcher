@@ -1,0 +1,17 @@
+# Categories in the order the app shows them.
+- id: languages
+  name: Languages and runtimes
+- id: frontend
+  name: Frontend
+- id: mobile
+  name: Mobile
+- id: backend
+  name: Backend frameworks
+- id: data
+  name: Databases and data
+- id: cloud
+  name: Cloud and infrastructure
+- id: workflows
+  name: Workflows and messaging
+- id: ai
+  name: AI and machine learning

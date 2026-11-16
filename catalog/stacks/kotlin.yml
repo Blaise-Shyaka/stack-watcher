@@ -1,0 +1,13 @@
+id: kotlin
+name: Kotlin
+category: languages
+aliases: [kt]
+mono: Kt
+hue: 280
+homepage: https://kotlinlang.org
+sources:
+  - kind: blog
+    url: https://blog.jetbrains.com/kotlin/feed/
+  - kind: release
+    url: https://github.com/JetBrains/kotlin/releases.atom
+    scheme: minor

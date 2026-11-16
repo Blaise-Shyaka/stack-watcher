@@ -1,0 +1,15 @@
+id: grafana
+name: Grafana
+category: cloud
+aliases: [grafana labs, loki, tempo]
+mono: Gf
+hue: 28
+homepage: https://grafana.com
+sources:
+  - kind: release
+    url: https://github.com/grafana/grafana/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://grafana.com/blog/index.xml
+  - kind: security
+    advisories: { ecosystem: go, packages: [github.com/grafana/grafana] }

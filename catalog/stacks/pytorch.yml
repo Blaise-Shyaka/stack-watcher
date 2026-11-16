@@ -1,0 +1,15 @@
+id: pytorch
+name: PyTorch
+category: ai
+aliases: [torch]
+mono: PT
+hue: 14
+homepage: https://pytorch.org
+sources:
+  - kind: release
+    url: https://github.com/pytorch/pytorch/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://pytorch.org/feed/
+  - kind: security
+    advisories: { ecosystem: pip, packages: [torch] }

@@ -1,0 +1,15 @@
+id: temporal
+name: Temporal
+category: workflows
+aliases: [temporalio]
+mono: T
+hue: 265
+homepage: https://temporal.io
+sources:
+  - kind: blog
+    url: https://example.test/blog.rss
+  - kind: release
+    url: https://example.test/sdk-rust.atom
+    label: Rust SDK
+  - kind: security
+    advisories: { ecosystem: npm, packages: ["@temporalio/worker"] }

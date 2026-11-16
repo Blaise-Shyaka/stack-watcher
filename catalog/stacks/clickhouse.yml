@@ -1,0 +1,12 @@
+id: clickhouse
+name: ClickHouse
+category: data
+aliases: [clickhouse db]
+mono: CH
+hue: 56
+homepage: https://clickhouse.com
+sources:
+  - kind: release
+    url: https://github.com/ClickHouse/ClickHouse/releases.atom
+  - kind: blog
+    url: https://clickhouse.com/rss.xml

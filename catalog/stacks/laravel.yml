@@ -1,0 +1,14 @@
+id: laravel
+name: Laravel
+category: backend
+aliases: [laravel framework]
+mono: La
+hue: 4
+homepage: https://laravel.com
+sources:
+  - kind: release
+    url: https://github.com/laravel/framework/releases.atom
+  - kind: blog
+    url: https://blog.laravel.com/feed
+  - kind: security
+    advisories: { ecosystem: composer, packages: [laravel/framework] }

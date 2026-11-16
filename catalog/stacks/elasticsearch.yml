@@ -1,0 +1,18 @@
+id: elasticsearch
+name: Elasticsearch
+category: data
+aliases: [elastic, es, elk]
+mono: El
+hue: 50
+homepage: https://www.elastic.co/elasticsearch
+sources:
+  - kind: release
+    url: https://github.com/elastic/elasticsearch/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://www.elastic.co/blog/feed
+    match: [Elasticsearch]
+  - kind: security
+    url: https://discuss.elastic.co/c/announcements/security-announcements/31.rss
+    label: Security announcements
+    match: [Elasticsearch]

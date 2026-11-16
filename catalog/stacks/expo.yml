@@ -1,0 +1,13 @@
+id: expo
+name: Expo
+category: mobile
+aliases: [expo sdk, eas]
+mono: Ex
+hue: 225
+homepage: https://expo.dev
+sources:
+  - kind: changelog
+    url: https://expo.dev/changelog/rss.xml
+    label: Expo changelog
+  - kind: security
+    advisories: { ecosystem: npm, packages: [expo] }

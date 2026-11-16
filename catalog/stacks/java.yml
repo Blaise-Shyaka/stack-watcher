@@ -1,0 +1,11 @@
+id: java
+name: Java
+category: languages
+aliases: [jdk, openjdk, jvm]
+mono: Jv
+hue: 8
+homepage: https://openjdk.org
+sources:
+  - kind: blog
+    url: https://inside.java/feed.xml
+    label: Inside Java

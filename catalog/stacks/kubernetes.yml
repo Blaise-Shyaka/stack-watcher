@@ -1,0 +1,17 @@
+id: kubernetes
+name: Kubernetes
+category: cloud
+aliases: [k8s, kube, kubectl]
+mono: K8s
+hue: 222
+homepage: https://kubernetes.io
+sources:
+  - kind: blog
+    url: https://kubernetes.io/feed.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/kubernetes/kubernetes/releases.atom
+    scheme: minor
+  - kind: security
+    url: https://kubernetes.io/docs/reference/issues-security/official-cve-feed/feed.xml
+    label: Official CVE feed

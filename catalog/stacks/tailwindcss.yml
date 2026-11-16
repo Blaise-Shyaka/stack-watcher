@@ -1,0 +1,14 @@
+id: tailwindcss
+name: Tailwind CSS
+category: frontend
+aliases: [tailwind, tw]
+mono: Tw
+hue: 186
+homepage: https://tailwindcss.com
+sources:
+  - kind: release
+    url: https://github.com/tailwindlabs/tailwindcss/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://tailwindcss.com/feeds/feed.xml
+    scheme: minor

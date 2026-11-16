@@ -1,0 +1,14 @@
+id: cloudflare
+name: Cloudflare
+category: cloud
+aliases: [cloudflare workers, workers, cf]
+mono: CF
+hue: 26
+homepage: https://www.cloudflare.com
+sources:
+  - kind: blog
+    url: https://blog.cloudflare.com/rss/
+  - kind: changelog
+    url: https://developers.cloudflare.com/changelog/rss/index.xml
+    label: Developer changelog
+    notable_only: true

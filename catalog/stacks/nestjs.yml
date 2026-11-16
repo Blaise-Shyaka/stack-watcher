@@ -1,0 +1,12 @@
+id: nestjs
+name: NestJS
+category: backend
+aliases: [nest, nest.js]
+mono: Ns
+hue: 345
+homepage: https://nestjs.com
+sources:
+  - kind: release
+    url: https://github.com/nestjs/nest/releases.atom
+  - kind: security
+    advisories: { ecosystem: npm, packages: ["@nestjs/core", "@nestjs/common"] }

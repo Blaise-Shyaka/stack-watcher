@@ -1,0 +1,14 @@
+id: mongodb
+name: MongoDB
+category: data
+aliases: [mongo]
+mono: Mo
+hue: 135
+homepage: https://www.mongodb.com
+sources:
+  - kind: blog
+    url: https://www.mongodb.com/blog/rss
+  - kind: release
+    url: https://github.com/mongodb/mongo/tags.atom
+    title_match: '^r\d+\.\d+\.\d+$'
+    scheme: minor

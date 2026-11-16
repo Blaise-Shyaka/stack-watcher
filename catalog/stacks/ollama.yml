@@ -1,0 +1,13 @@
+id: ollama
+name: Ollama
+category: ai
+aliases: [local llm]
+mono: Ol
+hue: 0
+homepage: https://ollama.com
+sources:
+  - kind: release
+    url: https://github.com/ollama/ollama/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://ollama.com/blog/rss

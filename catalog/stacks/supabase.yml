@@ -1,0 +1,15 @@
+id: supabase
+name: Supabase
+category: data
+aliases: [supabase js]
+mono: Sb
+hue: 145
+homepage: https://supabase.com
+sources:
+  - kind: blog
+    url: https://supabase.com/rss.xml
+  - kind: release
+    url: https://github.com/supabase/supabase-js/releases.atom
+    label: supabase-js
+  - kind: security
+    advisories: { ecosystem: npm, packages: ["@supabase/supabase-js", "@supabase/auth-js"] }

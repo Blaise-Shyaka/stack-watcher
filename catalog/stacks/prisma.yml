@@ -1,0 +1,14 @@
+id: prisma
+name: Prisma
+category: data
+aliases: [prisma orm]
+mono: Pr
+hue: 230
+homepage: https://www.prisma.io
+sources:
+  - kind: release
+    url: https://github.com/prisma/prisma/releases.atom
+  - kind: blog
+    url: https://www.prisma.io/blog/rss.xml
+  - kind: security
+    advisories: { ecosystem: npm, packages: [prisma, "@prisma/client"] }

@@ -1,0 +1,11 @@
+id: vercel
+name: Vercel
+category: cloud
+aliases: [vercel platform]
+mono: Vc
+hue: 245
+homepage: https://vercel.com
+sources:
+  - kind: changelog
+    url: https://vercel.com/atom
+    label: Vercel changelog

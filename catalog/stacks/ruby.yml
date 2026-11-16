@@ -1,0 +1,12 @@
+id: ruby
+name: Ruby
+category: languages
+aliases: [rb, mri]
+mono: Rb
+hue: 350
+homepage: https://www.ruby-lang.org
+sources:
+  - kind: blog
+    url: https://www.ruby-lang.org/en/feeds/news.rss
+    label: Ruby news
+    scheme: minor

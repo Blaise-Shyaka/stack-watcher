@@ -1,0 +1,14 @@
+id: kafka
+name: Apache Kafka
+category: workflows
+aliases: [kafka, kraft]
+mono: Kf
+hue: 240
+homepage: https://kafka.apache.org
+sources:
+  - kind: release
+    url: https://github.com/apache/kafka/tags.atom
+    title_match: '^\d+\.\d+\.\d+$'
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: maven, packages: ["org.apache.kafka:kafka-clients", "org.apache.kafka:kafka_2.13"] }

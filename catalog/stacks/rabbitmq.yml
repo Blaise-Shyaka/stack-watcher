@@ -1,0 +1,13 @@
+id: rabbitmq
+name: RabbitMQ
+category: workflows
+aliases: [rabbit, amqp]
+mono: RMQ
+hue: 24
+homepage: https://www.rabbitmq.com
+sources:
+  - kind: release
+    url: https://github.com/rabbitmq/rabbitmq-server/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://www.rabbitmq.com/blog/rss.xml

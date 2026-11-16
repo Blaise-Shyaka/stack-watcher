@@ -1,0 +1,15 @@
+id: flutter
+name: Flutter
+category: mobile
+aliases: [dart, flutter sdk]
+mono: Fl
+hue: 205
+homepage: https://flutter.dev
+sources:
+  - kind: blog
+    url: https://medium.com/feed/flutter
+    label: Flutter blog
+    scheme: minor
+  - kind: release
+    url: https://github.com/flutter/flutter/releases.atom
+    scheme: minor

@@ -1,0 +1,11 @@
+id: google-cloud
+name: Google Cloud
+category: cloud
+aliases: [gcp, google cloud platform]
+mono: GC
+hue: 218
+homepage: https://cloud.google.com
+sources:
+  - kind: blog
+    url: https://cloudblog.withgoogle.com/rss/
+    label: Google Cloud blog

@@ -1,0 +1,15 @@
+id: github
+name: GitHub
+category: cloud
+aliases: [github actions, actions, copilot, gh]
+mono: GH
+hue: 250
+homepage: https://github.com
+sources:
+  - kind: changelog
+    url: https://github.blog/changelog/feed/
+    label: GitHub changelog
+    notable_only: true
+  - kind: blog
+    url: https://github.blog/feed/
+    label: GitHub blog

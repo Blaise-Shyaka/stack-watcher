@@ -1,0 +1,14 @@
+id: express
+name: Express
+category: backend
+aliases: [expressjs, express.js]
+mono: Exp
+hue: 0
+homepage: https://expressjs.com
+sources:
+  - kind: release
+    url: https://github.com/expressjs/express/releases.atom
+  - kind: blog
+    url: https://expressjs.com/feed.xml
+  - kind: security
+    advisories: { ecosystem: npm, packages: [express, body-parser] }

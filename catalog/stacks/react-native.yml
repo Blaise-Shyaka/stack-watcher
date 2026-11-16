@@ -1,0 +1,16 @@
+id: react-native
+name: React Native
+category: mobile
+aliases: [rn, reactnative]
+mono: RN
+hue: 196
+homepage: https://reactnative.dev
+sources:
+  - kind: blog
+    url: https://reactnative.dev/blog/rss.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/facebook/react-native/releases.atom
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [react-native] }

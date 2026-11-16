@@ -1,0 +1,15 @@
+id: go
+name: Go
+category: languages
+aliases: [golang]
+mono: Go
+hue: 190
+homepage: https://go.dev
+sources:
+  - kind: blog
+    url: https://go.dev/blog/feed.atom
+    scheme: minor
+  - kind: release
+    url: https://github.com/golang/go/tags.atom
+    title_match: '^go1\.'
+    scheme: minor

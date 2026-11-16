@@ -1,0 +1,70 @@
+name: Feed
+
+# Reads every source in the catalog and publishes the files the app reads to the
+# `feed` branch (one commit, replaced on each run).
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "catalog/**"
+      - "pipeline/**"
+      - "requirements.txt"
+      - ".github/workflows/feed.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: feed
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Load the previous feed
+        run: |
+          mkdir -p out
+          if git ls-remote --exit-code --heads origin feed > /dev/null; then
+            git fetch --depth 1 origin feed
+            git archive FETCH_HEAD | tar -x -C out
+          fi
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -m pipeline.build --catalog catalog --out out | tee build.log
+          {
+            echo '## Feed build'
+            echo '```'
+            cat build.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to the feed branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pub=$(mktemp -d)
+          cp -r out/. "$pub"/
+          cd "$pub"
+          git init -q -b feed
+          git add -A
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Feed $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" feed

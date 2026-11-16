@@ -1,0 +1,14 @@
+id: angular
+name: Angular
+category: frontend
+aliases: [angularjs, ng]
+mono: Ng
+hue: 352
+homepage: https://angular.dev
+sources:
+  - kind: blog
+    url: https://blog.angular.dev/feed
+  - kind: release
+    url: https://github.com/angular/angular/releases.atom
+  - kind: security
+    advisories: { ecosystem: npm, packages: ["@angular/core", "@angular/common", "@angular/compiler", "@angular/platform-server"] }

@@ -1,0 +1,11 @@
+id: postgresql
+name: PostgreSQL
+category: data
+aliases: [postgres, pg, psql]
+mono: Pg
+hue: 205
+homepage: https://www.postgresql.org
+sources:
+  - kind: blog
+    url: https://www.postgresql.org/news.rss
+    label: PostgreSQL news

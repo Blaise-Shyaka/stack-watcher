@@ -1,0 +1,16 @@
+id: vue
+name: Vue
+category: frontend
+aliases: [vuejs, vue.js]
+mono: Vu
+hue: 153
+homepage: https://vuejs.org
+sources:
+  - kind: release
+    url: https://github.com/vuejs/core/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://blog.vuejs.org/feed.rss
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [vue, "@vue/compiler-sfc"] }

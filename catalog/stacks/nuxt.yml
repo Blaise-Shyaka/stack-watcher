@@ -1,0 +1,16 @@
+id: nuxt
+name: Nuxt
+category: frontend
+aliases: [nuxtjs, nuxt.js]
+mono: Nu
+hue: 158
+homepage: https://nuxt.com
+sources:
+  - kind: release
+    url: https://github.com/nuxt/nuxt/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://nuxt.com/blog/rss.xml
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [nuxt] }

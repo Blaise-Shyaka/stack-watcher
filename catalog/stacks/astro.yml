@@ -1,0 +1,17 @@
+id: astro
+name: Astro
+category: frontend
+aliases: [astro.build, astrojs]
+mono: As
+hue: 290
+homepage: https://astro.build
+sources:
+  - kind: blog
+    url: https://astro.build/rss.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/withastro/astro/releases.atom
+    title_match: '^astro@'
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [astro] }

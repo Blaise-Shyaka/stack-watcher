@@ -1,0 +1,15 @@
+id: mysql
+name: MySQL
+category: data
+aliases: [mysql server, innodb]
+mono: My
+hue: 198
+homepage: https://www.mysql.com
+sources:
+  - kind: blog
+    url: https://blogs.oracle.com/mysql/rss
+    label: MySQL blog
+  - kind: release
+    url: https://github.com/mysql/mysql-server/tags.atom
+    title_match: '^mysql-\d'
+    scheme: minor

@@ -1,0 +1,11 @@
+id: swift
+name: Swift
+category: languages
+aliases: [swiftlang]
+mono: Sw
+hue: 14
+homepage: https://www.swift.org
+sources:
+  - kind: blog
+    url: https://www.swift.org/atom.xml
+    scheme: minor

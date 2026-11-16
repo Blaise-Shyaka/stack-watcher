@@ -15,11 +15,11 @@ Built as a CloudCrane phone app, fed by a small pipeline in this repository.
 | Catalog growth | Users request a missing stack through a GitHub issue form; a curator adds it by PR | Quality stays curated; anyone can ask |
 | Scale | Launch with about 65 stacks, grow towards 100+ | Built for other people, not one person's stack |
 | Collection | A scheduled GitHub Actions workflow reads every feed | Free for public repos, no server, no database |
-| Storage | Generated JSON on a `feed` branch, served by GitHub Pages | A git branch is the database and its history; Pages is the CDN |
+| Storage | Generated JSON on a `feed` branch (one commit, replaced on each run), read from raw.githubusercontent.com | No server and nothing to switch on; the branch stays small |
 | CVEs | GitHub Advisory Database, queried by the workflow (never by the app), plus projects' own security feeds | RSS has no reliable per-package CVE feed |
 | Pipeline language | Python with `feedparser` | The most forgiving parser for real-world feeds |
 | App | One HTML file on CloudCrane, talking to one site (the Pages feed) | Fits CloudCrane's limits: 1 MB, 5 sites, data on the phone |
-| Personalization | Done on the phone | What you follow never leaves your phone except as file names requested from GitHub Pages |
+| Personalization | Done on the phone | What you follow never leaves your phone except as the file names it requests |
 | Design | CloudCrane UI kit, plus a small feed layer of our own | Native on iPhone and Android, passes CloudCrane's checks; see [DESIGN.md](DESIGN.md) |
 
 ## How it fits together
@@ -30,11 +30,11 @@ catalog/<stack>.yml  (curated, via PRs)         Search the list, follow stacks
         |                                       Build today's briefing on the phone
         v                                       Works offline
 Workflow, every 6 hours (GitHub Actions)               ^
-  fetch RSS/Atom feeds + security advisories           |  one site: blaise-shyaka.github.io
+  fetch RSS/Atom feeds + security advisories           |  one site: raw.githubusercontent.com
   clean, dedupe, classify, score, keep 30 days         |  sends: which stacks you follow
         |                                              |
         v                                              |
-feed branch -> GitHub Pages: catalog.json, stacks/<id>.json
+feed branch: catalog.json, stacks/<id>.json
 
 "Request a stack" issue form -> PR adding catalog/<id>.yml -> CI checks every feed -> merge
 ```
@@ -100,9 +100,10 @@ sources:
 
    A source's first-ever release counts as Notable even when it is a preview.
 6. Drop duplicates (same URL from two feeds) and items older than 30 days.
-7. Write the files below, commit them to the `feed` branch, and deploy to Pages.
-   Committing also keeps the schedule alive: GitHub pauses scheduled workflows
-   in public repos after 60 days without activity.
+7. Write the files below and publish them as a single commit on the `feed`
+   branch, replaced on each run so the repository doesn't grow. The push also
+   keeps the schedule alive: GitHub pauses scheduled workflows in public repos
+   after 60 days without activity.
 8. One broken feed never fails the run. `health.json` records each source's last
    success and error.
 
@@ -153,8 +154,9 @@ latest three items so the curator can judge relevance.
 
 - One self-contained HTML file using the CloudCrane UI kit (`/_cc/lib/ccui-1.0.0.*`)
   and its icons.
-- Network: one site, `blaise-shyaka.github.io`. Sends: which stacks you follow
-  (as file names). Nothing else of yours leaves the phone.
+- Network: one site, `raw.githubusercontent.com`, reading
+  `Blaise-Shyaka/stack-watcher/feed/...`. Sends: which stacks you follow (as file
+  names). Nothing else of yours leaves the phone.
 - Once a day (first open), it fetches `catalog.json` and the file for each stack
   you follow, then builds Today on the phone from what is new since your last visit.
   The first briefing covers the last 14 days.
@@ -201,9 +203,8 @@ Phase A, the feed (this repo):
 2. Draft stack list (below), reviewed by you.
 3. Sources for each stack, checked by the validate workflow (this sandbox can't
    reach most feed hosts, so CI is the checker).
-4. Feed workflow and Pages.
-5. You: merge to `main` (scheduled workflows only run on the default branch) and
-   turn on Pages (Settings, Pages, Source: GitHub Actions).
+4. Feed workflow publishing the `feed` branch. Scheduled workflows run on the
+   default branch, which is currently `claude/friendly-ptolemy-w1ssxs`.
 
 Phase B, the app (CloudCrane):
 
@@ -221,7 +222,7 @@ Phase B, the app (CloudCrane):
 - Freshness is up to 6 hours behind the source.
 - A stack is only as good as its feeds; some projects publish no feed (fallbacks:
   GitHub release feeds, a changelog page feed, or leave it out).
-- GitHub Pages caches files for about 10 minutes.
+- raw.githubusercontent.com caches files for about 5 minutes.
 - What you follow is visible to GitHub as the file names your phone requests.
 
 ## Appendix: draft stack list (for review)

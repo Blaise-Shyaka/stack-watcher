@@ -1,0 +1,18 @@
+id: react
+name: React
+category: frontend
+aliases: [reactjs, react.js, react dom]
+mono: Re
+hue: 193
+homepage: https://react.dev
+sources:
+  - kind: blog
+    url: https://react.dev/rss.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/facebook/react/releases.atom
+    scheme: minor
+  - kind: security
+    advisories:
+      ecosystem: npm
+      packages: [react, react-dom, react-server-dom-webpack, react-server-dom-turbopack, react-server-dom-parcel]

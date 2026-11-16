@@ -1,0 +1,16 @@
+id: python
+name: Python
+category: languages
+aliases: [cpython, py]
+mono: Py
+hue: 48
+homepage: https://www.python.org
+sources:
+  - kind: blog
+    url: https://blog.python.org/feeds/posts/default?alt=rss
+    label: Python Insider
+    scheme: minor
+  - kind: release
+    url: https://github.com/python/cpython/tags.atom
+    title_match: '^v3\.'
+    scheme: minor

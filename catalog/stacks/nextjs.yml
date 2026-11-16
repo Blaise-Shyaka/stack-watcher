@@ -1,0 +1,16 @@
+id: nextjs
+name: Next.js
+category: frontend
+aliases: [next, nextjs]
+mono: N
+hue: 240
+homepage: https://nextjs.org
+sources:
+  - kind: blog
+    url: https://nextjs.org/feed.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/vercel/next.js/releases.atom
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: npm, packages: [next] }

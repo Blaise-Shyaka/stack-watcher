@@ -1,0 +1,12 @@
+id: fastapi
+name: FastAPI
+category: backend
+aliases: [starlette]
+mono: FA
+hue: 170
+homepage: https://fastapi.tiangolo.com
+sources:
+  - kind: release
+    url: https://github.com/fastapi/fastapi/releases.atom
+  - kind: security
+    advisories: { ecosystem: pip, packages: [fastapi, starlette] }

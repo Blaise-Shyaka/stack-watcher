@@ -1,0 +1,20 @@
+id: anthropic
+name: Anthropic
+category: ai
+aliases: [claude, claude api, claude code]
+mono: An
+hue: 22
+homepage: https://www.anthropic.com
+sources:
+  - kind: release
+    url: https://github.com/anthropics/anthropic-sdk-python/releases.atom
+    label: Python SDK
+  - kind: release
+    url: https://github.com/anthropics/anthropic-sdk-typescript/releases.atom
+    label: TypeScript SDK
+  - kind: release
+    url: https://github.com/anthropics/claude-code/releases.atom
+    label: Claude Code
+  - kind: blog
+    url: https://www.anthropic.com/news/rss.xml
+    label: Anthropic news

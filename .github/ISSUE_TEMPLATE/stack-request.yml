@@ -1,0 +1,43 @@
+name: Request a stack
+description: Ask for a stack to be added to Stack Watch.
+title: "Stack request: "
+labels: ["stack request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for asking. Every stack is added by hand, from its official sources.
+        Links are the most helpful part; fill in what you know.
+  - type: input
+    id: name
+    attributes:
+      label: Stack name
+      placeholder: Dagster
+    validations:
+      required: true
+  - type: input
+    id: homepage
+    attributes:
+      label: Official website
+      placeholder: https://dagster.io
+  - type: textarea
+    id: sources
+    attributes:
+      label: Official blog, changelog or release notes
+      description: RSS or Atom feed links if you know them, otherwise the pages.
+    validations:
+      required: true
+  - type: input
+    id: repo
+    attributes:
+      label: Main GitHub repository
+      placeholder: dagster-io/dagster
+  - type: textarea
+    id: packages
+    attributes:
+      label: Package names, for security advisories
+      description: "For example: npm next, PyPI django, Go go.temporal.io/sdk"
+  - type: textarea
+    id: why
+    attributes:
+      label: What do you use it for? (optional)

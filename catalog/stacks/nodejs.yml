@@ -1,0 +1,16 @@
+id: nodejs
+name: Node.js
+category: languages
+aliases: [node, nodejs]
+mono: "No"
+hue: 120
+homepage: https://nodejs.org
+sources:
+  - kind: blog
+    url: https://nodejs.org/en/feed/blog.xml
+    title_match: '^(?!Node(\.js)? v?\d)'
+  - kind: security
+    url: https://nodejs.org/en/feed/vulnerability.xml
+    label: Security releases
+  - kind: release
+    url: https://github.com/nodejs/node/releases.atom

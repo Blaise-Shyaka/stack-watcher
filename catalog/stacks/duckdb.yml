@@ -1,0 +1,13 @@
+id: duckdb
+name: DuckDB
+category: data
+aliases: [duck db]
+mono: Du
+hue: 52
+homepage: https://duckdb.org
+sources:
+  - kind: release
+    url: https://github.com/duckdb/duckdb/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://duckdb.org/feed.xml

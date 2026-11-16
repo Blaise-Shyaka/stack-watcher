@@ -1,0 +1,14 @@
+id: rust
+name: Rust
+category: languages
+aliases: [rustlang, cargo, rustc]
+mono: Rs
+hue: 18
+homepage: https://www.rust-lang.org
+sources:
+  - kind: blog
+    url: https://blog.rust-lang.org/feed.xml
+    scheme: minor
+  - kind: release
+    url: https://github.com/rust-lang/rust/releases.atom
+    scheme: minor

@@ -1,0 +1,47 @@
+id: temporal
+name: Temporal
+category: workflows
+aliases: [temporal.io, temporalio, durable execution]
+mono: T
+hue: 265
+homepage: https://temporal.io
+sources:
+  - kind: blog
+    url: https://temporal.io/blog/rss.xml
+  - kind: release
+    url: https://github.com/temporalio/temporal/releases.atom
+    label: Server
+  - kind: release
+    url: https://github.com/temporalio/cli/releases.atom
+    label: CLI
+  - kind: release
+    url: https://github.com/temporalio/sdk-go/releases.atom
+    label: Go SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-java/releases.atom
+    label: Java SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-typescript/releases.atom
+    label: TypeScript SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-python/releases.atom
+    label: Python SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-dotnet/releases.atom
+    label: .NET SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-ruby/releases.atom
+    label: Ruby SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-php/releases.atom
+    label: PHP SDK
+  - kind: release
+    url: https://github.com/temporalio/sdk-rust/releases.atom
+    label: Rust SDK
+    title_match: '^v\d'
+  - kind: security
+    advisories: { ecosystem: go, packages: [go.temporal.io/server, go.temporal.io/sdk] }
+  - kind: security
+    advisories: { ecosystem: npm, packages: ["@temporalio/worker", "@temporalio/client"] }
+  - kind: security
+    advisories: { ecosystem: pip, packages: [temporalio] }

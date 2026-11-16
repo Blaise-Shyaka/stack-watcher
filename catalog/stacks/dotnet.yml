@@ -1,0 +1,12 @@
+id: dotnet
+name: .NET
+category: languages
+aliases: [dotnet, csharp, "c#", net core]
+mono: .N
+hue: 262
+homepage: https://dotnet.microsoft.com
+sources:
+  - kind: blog
+    url: https://devblogs.microsoft.com/dotnet/feed/
+  - kind: release
+    url: https://github.com/dotnet/core/releases.atom

@@ -1,0 +1,13 @@
+id: bun
+name: Bun
+category: languages
+aliases: [bunjs, bun.sh]
+mono: Bu
+hue: 30
+homepage: https://bun.com
+sources:
+  - kind: release
+    url: https://github.com/oven-sh/bun/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://bun.com/rss.xml

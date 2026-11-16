@@ -1,0 +1,14 @@
+id: django
+name: Django
+category: backend
+aliases: [djangoproject]
+mono: Dj
+hue: 150
+homepage: https://www.djangoproject.com
+sources:
+  - kind: blog
+    url: https://www.djangoproject.com/rss/weblog/
+    label: Django weblog
+    scheme: minor
+  - kind: security
+    advisories: { ecosystem: pip, packages: [django] }

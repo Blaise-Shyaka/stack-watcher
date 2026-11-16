@@ -1,0 +1,13 @@
+id: redis
+name: Redis
+category: data
+aliases: [redis server, valkey]
+mono: Rd
+hue: 2
+homepage: https://redis.io
+sources:
+  - kind: release
+    url: https://github.com/redis/redis/releases.atom
+    scheme: minor
+  - kind: blog
+    url: https://redis.io/blog/feed/

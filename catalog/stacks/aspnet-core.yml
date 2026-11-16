@@ -1,0 +1,15 @@
+id: aspnet-core
+name: ASP.NET Core
+category: backend
+aliases: [aspnet, asp.net, blazor, kestrel]
+mono: AN
+hue: 255
+homepage: https://dotnet.microsoft.com/apps/aspnet
+sources:
+  - kind: blog
+    url: https://devblogs.microsoft.com/dotnet/category/aspnet/feed/
+    label: .NET blog
+  - kind: release
+    url: https://github.com/dotnet/aspnetcore/releases.atom
+  - kind: security
+    advisories: { ecosystem: nuget, packages: [Microsoft.AspNetCore.Server.Kestrel.Core, Microsoft.AspNetCore.App.Runtime.linux-x64] }

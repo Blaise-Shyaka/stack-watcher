@@ -1,0 +1,23 @@
+id: spring-boot
+name: Spring Boot
+category: backend
+aliases: [spring, spring framework]
+mono: Sp
+hue: 100
+homepage: https://spring.io/projects/spring-boot
+sources:
+  - kind: blog
+    url: https://spring.io/blog.atom
+    label: Spring blog
+  - kind: release
+    url: https://github.com/spring-projects/spring-boot/releases.atom
+    scheme: minor
+  - kind: security
+    advisories:
+      ecosystem: maven
+      packages:
+        - org.springframework.boot:spring-boot
+        - org.springframework:spring-core
+        - org.springframework:spring-web
+        - org.springframework:spring-webmvc
+        - org.springframework.security:spring-security-core
