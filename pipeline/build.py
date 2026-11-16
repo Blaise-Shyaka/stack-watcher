@@ -31,6 +31,8 @@ from .catalog import load_catalog
 from .fetch import FetchResult, fetch_advisories, fetch_feed, make_session
 
 WINDOW_DAYS = 30
+# Raise when parsing or summaries change: cached feeds are then fetched again in full.
+PARSER_VERSION = 2
 MAX_ITEMS = 150
 GROUP_ORDER = {"act": 0, "notable": 1, "read": 2, "routine": 3}
 DEFAULT_SOURCE = {"blog": "Official blog", "release": "Release", "changelog": "Changelog",
@@ -233,9 +235,15 @@ def build(catalog_dir: Path, out_dir: Path, now: datetime | None = None,
                 f["stacks"].add(s["id"])
 
     urls = sorted(feeds)
+
+    def conditional(u):
+        st = state.get(u, {})
+        if st.get("parser") != PARSER_VERSION:
+            return fetch_fn(u, None, None)
+        return fetch_fn(u, st.get("etag"), st.get("modified"))
+
     with ThreadPoolExecutor(max_workers=10) as pool:
-        results = list(pool.map(
-            lambda u: fetch_fn(u, state.get(u, {}).get("etag"), state.get(u, {}).get("modified")), urls))
+        results = list(pool.map(conditional, urls))
 
     feed_entries: dict[str, tuple[list[dict], int]] = {}
     health_sources = []
@@ -252,7 +260,7 @@ def build(catalog_dir: Path, out_dir: Path, now: datetime | None = None,
                 seen = list(dict.fromkeys(cache.get("seen", []) + [e["key"] for e in parsed]))[-500:]
                 cache = {"entries": parsed, "seen": seen}
                 write_json(cache_path, cache)
-                st.update(etag=res.etag, modified=res.modified)
+                st.update(etag=res.etag, modified=res.modified, parser=PARSER_VERSION)
         elif res.status != 304:
             error = res.error or f"HTTP {res.status}"
         if error:

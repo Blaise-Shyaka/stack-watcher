@@ -98,6 +98,8 @@ def test_release_summary_drops_pr_noise():
 def test_release_summary_skips_headings():
     html = "<h2>Highlights</h2><h3>Added</h3><ul><li>Header encoding option</li></ul>"
     assert C.release_summary(html, "v0.4.0") == "Header encoding option."
+    html2 = "<h3>💥 Breaking Changes</h3><ul><li>Renamed the output flag</li></ul>"
+    assert C.release_summary(html2, "v1.10.0") == "Renamed the output flag."
 
 
 def test_sentence_summary_is_short():

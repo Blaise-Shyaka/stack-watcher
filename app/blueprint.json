@@ -1,0 +1,167 @@
+{
+  "v": 1,
+  "purpose": "A daily briefing of what changed in the tech stacks you follow: releases, security advisories and posts from each project's own team, most important first.",
+  "category": "news",
+  "icon": "sunrise",
+  "tags": [
+    "developer-tools",
+    "releases",
+    "security",
+    "news",
+    "briefing"
+  ],
+  "screens": [
+    {
+      "id": "today",
+      "says": "Today's briefing: what changed in the stacks you follow, in four groups (Act on it, Notable releases, Worth reading, routine updates), ending with You're caught up.",
+      "states": {
+        "empty": "Asks you to choose the stacks you work with, with popular ones to follow in one tap.",
+        "loading": "Shows the last briefing, or placeholder rows the very first time.",
+        "offline": "Shows the last briefing with the time it was fetched.",
+        "error": "Says the feed couldn't be reached, keeps the last briefing and offers Try again."
+      }
+    },
+    {
+      "id": "detail",
+      "says": "One item: its summary, its badges, why it's in your briefing and a link to the source."
+    },
+    {
+      "id": "stacks",
+      "says": "Search the curated list of stacks by name or alias, follow and unfollow them, and request one that isn't there.",
+      "states": {
+        "empty": "When a search finds nothing, offers to request the stack on GitHub.",
+        "loading": "Placeholder rows while the list loads.",
+        "offline": "Shows the list from last time.",
+        "error": "Says the list of stacks couldn't be loaded and offers Try again."
+      }
+    }
+  ],
+  "data": {
+    "version": 1,
+    "keeps": [
+      {
+        "key": "sw.version",
+        "what": "The version of the saved data, for moving it forward when the app changes"
+      },
+      {
+        "key": "sw.follows",
+        "what": "The ids of the stacks you follow"
+      },
+      {
+        "key": "sw.seen",
+        "what": "When you last opened the app and which items you opened, to know what's new",
+        "shape": {
+          "day": "text",
+          "since": "date",
+          "lastOpenAt": "date",
+          "opened": "object"
+        }
+      },
+      {
+        "key": "sw.cache",
+        "what": "The last list of stacks and the last items for the stacks you follow, for offline use",
+        "shape": {
+          "catalog": "object",
+          "stacks": "object"
+        }
+      }
+    ]
+  },
+  "journeys": [
+    {
+      "id": "J-1",
+      "title": "Pick my stacks",
+      "steps": [
+        {
+          "id": "J-1.1",
+          "text": "Open the app for the first time and see a prompt to choose stacks"
+        },
+        {
+          "id": "J-1.2",
+          "text": "Search the list for a stack by name or alias"
+        },
+        {
+          "id": "J-1.3",
+          "text": "Follow a stack and see it counted as followed"
+        }
+      ]
+    },
+    {
+      "id": "J-2",
+      "title": "Read today's briefing",
+      "steps": [
+        {
+          "id": "J-2.1",
+          "text": "See what changed in my stacks, grouped into Act on it, Notable releases, Worth reading and routine updates"
+        },
+        {
+          "id": "J-2.2",
+          "text": "Open an item to see its summary and why it's in my briefing"
+        },
+        {
+          "id": "J-2.3",
+          "text": "Find the link to the item's source"
+        }
+      ]
+    },
+    {
+      "id": "J-3",
+      "title": "Ask for a missing stack",
+      "steps": [
+        {
+          "id": "J-3.1",
+          "text": "Search for a stack that isn't in the list and see the offer to request it"
+        },
+        {
+          "id": "J-3.2",
+          "text": "See the link to the request form on GitHub"
+        }
+      ]
+    },
+    {
+      "id": "J-4",
+      "title": "Without a connection",
+      "steps": [
+        {
+          "id": "J-4.1",
+          "text": "See what's wrong and a way to try again, with the last briefing kept when there is one"
+        }
+      ]
+    }
+  ],
+  "promises": [
+    {
+      "id": "P-1",
+      "kind": "data",
+      "text": "The stacks you follow stay followed when the app is closed or updated."
+    },
+    {
+      "id": "P-2",
+      "text": "Security advisories and breaking changes always come first in the briefing."
+    }
+  ],
+  "network": [
+    {
+      "site": "raw.githubusercontent.com",
+      "why": "To get the curated list of stacks and the latest items for the stacks you follow, which this app's feed publishes there every 6 hours.",
+      "sends": "The names of the stacks you follow"
+    },
+    {
+      "site": "github.com",
+      "why": "Opens the form to request a stack that isn't in the list, only when you tap Request it.",
+      "sends": "Nothing; the form opens in your browser"
+    }
+  ],
+  "design": {
+    "notes": "CloudCrane UI kit for controls, plus a small feed layer: item rows, badges, stack monograms. Red is for security only.",
+    "tokens": {
+      "color.background": "#F2F2F7",
+      "color.surface": "#FFFFFF",
+      "color.text": "#111316",
+      "color.primary": "#0F766E",
+      "color.danger": "#B42318",
+      "border-radius": "12px",
+      "font-family": "system-ui"
+    }
+  }
+}

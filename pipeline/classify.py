@@ -156,7 +156,8 @@ def release_summary(raw: str | None, title: str = "") -> str:
     """The first meaningful lines of release notes, without PR noise."""
     parts: list[str] = []
     for line in html_lines(raw):
-        if SKIP_LINE_RE.match(line) or HEADING_RE.match(line) or line.startswith("@"):
+        core = re.sub(r"^[^\w(]+", "", line)
+        if SKIP_LINE_RE.match(core) or HEADING_RE.match(core) or line.startswith("@"):
             continue
         line = PR_TAIL_RE.sub("", line)
         line = URL_RE.sub("", line).strip(" ()")
