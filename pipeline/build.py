@@ -35,7 +35,9 @@ MAX_ITEMS = 150
 GROUP_ORDER = {"act": 0, "notable": 1, "read": 2, "routine": 3}
 DEFAULT_SOURCE = {"blog": "Official blog", "release": "Release", "changelog": "Changelog",
                   "security": "Security advisory"}
-BARE_TAG_RE = re.compile(r"(?i)(v|go|r|version-|release-|rel-|mysql-|jdk-|rel/)?\d[\w.+-]*")
+BARE_TAG_RE = re.compile(r"(?i)(v|go|r|version-|release-|rel-|mysql-|jdk-|rel/|sdk-v?)?\d[\w.+-]*")
+RELEASE_PREFIX_RE = re.compile(r"(?i)^release:?\s+")
+DATE_SUFFIX_RE = re.compile(r"\s*/\s*\d{4}-\d{2}-\d{2}$")
 
 
 class CatalogError(Exception):
@@ -74,8 +76,9 @@ def write_json(path: Path, data) -> None:
 
 # --- feeds -------------------------------------------------------------------
 
-def parse_feed(body: bytes, kind: str) -> list[dict] | None:
+def parse_feed(body: bytes, kind: str, url: str = "") -> list[dict] | None:
     """Normalized entries, or None when the body isn't a feed."""
+    tags_feed = url.endswith("/tags.atom")
     fp = feedparser.parse(body)
     if not fp.entries and (fp.bozo or not fp.feed):
         return None
@@ -83,6 +86,9 @@ def parse_feed(body: bytes, kind: str) -> list[dict] | None:
     for e in fp.entries[:50]:
         link = e.get("link") or ""
         title = " ".join(C.html_lines(e.get("title") or "")) or link
+        if tags_feed:
+            # A tags feed titles entries with the commit message; the tag is what matters.
+            title = C.tag_from_url(link) or title
         content = ""
         if e.get("content"):
             content = e["content"][0].get("value") or ""
@@ -108,8 +114,10 @@ def parse_feed(body: bytes, kind: str) -> list[dict] | None:
 
 def display_title(stack: dict, src: dict, title: str, link: str) -> str:
     """Give bare tags ("v1.0.0", "go1.25.4") the project's name."""
-    if not BARE_TAG_RE.fullmatch(title.strip()):
+    bare = DATE_SUFFIX_RE.sub("", RELEASE_PREFIX_RE.sub("", title.strip()))
+    if not BARE_TAG_RE.fullmatch(bare):
         return title
+    title = bare
     m = C.VERSION_RE.search(title)
     version = title[m.start():] if m else title
     name = stack["name"]
@@ -163,7 +171,7 @@ def stack_items(stack: dict, feed_entries: dict, adv_entries: dict, first_seen: 
         if src.get("title_match"):
             rx = re.compile(src["title_match"])
             entries = [e for e in entries
-                       if rx.search(e["title"]) or rx.search(C.tag_from_url(e["link"]) or "")]
+                       if rx.search(e["title"]) or ((C.tag_from_url(e["link"]) or None) and rx.search(C.tag_from_url(e["link"])))]
         scheme = src.get("scheme", "semver")
         first_release = src["kind"] == "release" and len(entries) == 1 and seen_count <= 1
         for e in entries:
@@ -237,7 +245,7 @@ def build(catalog_dir: Path, out_dir: Path, now: datetime | None = None,
         cache = read_json(cache_path, {"entries": [], "seen": []})
         error = None
         if res.status == 200 and res.body is not None and not res.error:
-            parsed = parse_feed(res.body, feeds[url]["kind"])
+            parsed = parse_feed(res.body, feeds[url]["kind"], url)
             if parsed is None:
                 error = "the address did not return an RSS or Atom feed"
             else:

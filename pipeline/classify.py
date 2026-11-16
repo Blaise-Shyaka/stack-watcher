@@ -22,7 +22,7 @@ PRE_AFTER_RE = re.compile(
     r"experimental|exp|ea|a|b|m)(?![a-z])",
     re.I,
 )
-PRE_ANYWHERE_RE = re.compile(r"\b(nightly|canary|snapshot|insiders)\b", re.I)
+PRE_ANYWHERE_RE = re.compile(r"\b(nightly|canary|snapshot|insiders)\b|[.-]pre\b", re.I)
 CVE_RE = re.compile(r"\bCVE-\d{4}-\d{4,}\b")
 SECURITY_TITLE_RE = re.compile(
     r"security[- ](releases?|updates?|fix(es)?|patch(es)?|advisor(y|ies)|bulletins?|announcements?)"
@@ -34,6 +34,7 @@ DEPRECATION_RE = re.compile(
     r"breaking changes?|retir(e|es|ing|ement))\b",
     re.I,
 )
+GA_RE = re.compile(r"general(ly)? availab(le|ility)|\bGA\b", re.I)
 BREAKING_BODY_RE = re.compile(r"(?i:\bbreaking changes?\b)|\bBREAKING\b")
 NO_BREAKING_RE = re.compile(r"\bno breaking changes?\b", re.I)
 ANNOUNCE_RE = re.compile(
@@ -43,6 +44,14 @@ ANNOUNCE_RE = re.compile(
 SKIP_LINE_RE = re.compile(
     r"^(what'?s changed|new contributors|full changelog|contributors|changelog|"
     r"release notes|assets|commits|sha256|checksums?)\b",
+    re.I,
+)
+# Changelog section headings carry no information on their own.
+HEADING_RE = re.compile(
+    r"^(highlights?|added|changed|changes|fixed|fixes|removed|deprecated|deprecations|security|"
+    r"features?|new features|bug ?fixes|notable changes|improvements|enhancements|breaking changes?|"
+    r"other changes|dependencies|dependency updates|maintenance|documentation|docs|internal|"
+    r"miscellaneous|misc|summary|overview|performance|refactor(ing)?|chores?|tests?)[:.]?$",
     re.I,
 )
 PR_TAIL_RE = re.compile(r"\s+by\s+@[\w-]+(\s+in\s+(https?://\S+|#\d+))?", re.I)
@@ -147,7 +156,7 @@ def release_summary(raw: str | None, title: str = "") -> str:
     """The first meaningful lines of release notes, without PR noise."""
     parts: list[str] = []
     for line in html_lines(raw):
-        if SKIP_LINE_RE.match(line) or line.startswith("@"):
+        if SKIP_LINE_RE.match(line) or HEADING_RE.match(line) or line.startswith("@"):
             continue
         line = PR_TAIL_RE.sub("", line)
         line = URL_RE.sub("", line).strip(" ()")
@@ -209,7 +218,7 @@ def classify_release(title: str, text: str, url: str | None, scheme: str = "semv
     if breaking:
         if verdict.group == "notable":
             verdict.badges.append("breaking")
-        elif "minor" in verdict.badges:
+        elif "minor" in verdict.badges and v.major >= 1:
             verdict = Verdict("act", 76, ["breaking"], cve)
     return verdict
 
@@ -221,7 +230,7 @@ def classify_post(title: str, text: str, kind: str, scheme: str = "semver",
         return Verdict("act", 85, ["security"], cve)
     if SECURITY_TITLE_RE.search(title) or (cve and kind != "changelog"):
         return Verdict("act", 82, ["security"], cve)
-    if DEPRECATION_RE.search(title):
+    if DEPRECATION_RE.search(title) and not NO_BREAKING_RE.search(title):
         badge = "deprecation" if re.search(r"deprecat|end[- ]of|EOL|sunset|retir", title, re.I) else "breaking"
         return Verdict("act", 76, [badge], cve)
     if ANNOUNCE_RE.search(title):
@@ -234,7 +243,7 @@ def classify_post(title: str, text: str, kind: str, scheme: str = "semver",
         for name in names or []:
             if re.search(rf"\b{re.escape(name)}\s+v?\d+(?![.\d])", title, re.I):
                 return Verdict("notable", 62, ["release"], cve)
-        if kind == "changelog":
+        if kind == "changelog" and GA_RE.search(title):
             return Verdict("notable", 60, ["release"], cve)
     if kind == "changelog":
         return Verdict("read", 42, [], cve)

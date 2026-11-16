@@ -11,4 +11,5 @@ sources:
     scheme: minor
   - kind: release
     url: https://github.com/microsoft/TypeScript/releases.atom
+    title_match: '^TypeScript \d'
     scheme: minor

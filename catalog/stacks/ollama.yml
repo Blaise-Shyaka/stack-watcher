@@ -9,5 +9,3 @@ sources:
   - kind: release
     url: https://github.com/ollama/ollama/releases.atom
     scheme: minor
-  - kind: blog
-    url: https://ollama.com/blog/rss

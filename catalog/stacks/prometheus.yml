@@ -8,6 +8,7 @@ homepage: https://prometheus.io
 sources:
   - kind: release
     url: https://github.com/prometheus/prometheus/releases.atom
+    title_match: '^v?[1-9]'
     scheme: minor
   - kind: blog
     url: https://prometheus.io/blog/feed.xml

@@ -53,7 +53,7 @@ def main(argv: list[str] | None = None) -> int:
 
     feed_entries, problems = {}, []
     for url, res in results.items():
-        entries = parse_feed(res.body, kinds[url]) if res.status == 200 and res.body else None
+        entries = parse_feed(res.body, kinds[url], url) if res.status == 200 and res.body else None
         if entries is None:
             problems.append((url, res.error or "not an RSS or Atom feed"))
             entries = []

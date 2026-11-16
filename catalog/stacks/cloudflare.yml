@@ -8,7 +8,3 @@ homepage: https://www.cloudflare.com
 sources:
   - kind: blog
     url: https://blog.cloudflare.com/rss/
-  - kind: changelog
-    url: https://developers.cloudflare.com/changelog/rss/index.xml
-    label: Developer changelog
-    notable_only: true

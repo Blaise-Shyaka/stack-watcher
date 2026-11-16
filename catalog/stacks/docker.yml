@@ -11,6 +11,7 @@ sources:
   - kind: release
     url: https://github.com/moby/moby/releases.atom
     label: Engine
+    title_match: '^v\d'
   - kind: release
     url: https://github.com/docker/compose/releases.atom
     label: Compose

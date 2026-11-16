@@ -9,7 +9,5 @@ sources:
   - kind: release
     url: https://github.com/langchain-ai/langchain/releases.atom
     title_match: '^langchain(-core)?=='
-  - kind: blog
-    url: https://blog.langchain.com/rss/
   - kind: security
     advisories: { ecosystem: pip, packages: [langchain, langchain-core, langchain-community] }

@@ -8,6 +8,7 @@ homepage: https://pytorch.org
 sources:
   - kind: release
     url: https://github.com/pytorch/pytorch/releases.atom
+    title_match: '^PyTorch \d'
     scheme: minor
   - kind: blog
     url: https://pytorch.org/feed/

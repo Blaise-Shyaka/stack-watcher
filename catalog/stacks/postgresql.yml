@@ -9,3 +9,4 @@ sources:
   - kind: blog
     url: https://www.postgresql.org/news.rss
     label: PostgreSQL news
+    title_match: '^PostgreSQL \d'

@@ -11,6 +11,7 @@ sources:
     scheme: minor
   - kind: release
     url: https://github.com/facebook/react-native/releases.atom
+    title_match: '^v\d'
     scheme: minor
   - kind: security
     advisories: { ecosystem: npm, packages: [react-native] }

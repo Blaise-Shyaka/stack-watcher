@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Stack Watch</title>
+<link rel="stylesheet" href="/_cc/lib/ccui-1.0.0.css">
+<style>
+:root {
+  --cc-accent: #0F766E;
+  --sw-muted: #5B606A;
+  --sw-sep: #E3E3E8;
+  --sw-chip-border: #D4D4DA;
+  --sw-danger: #B42318; --sw-danger-bg: #FDECEA; --sw-danger-bd: #F5C2BD;
+  --sw-warn: #9A5B00; --sw-warn-bg: #FFF4E0; --sw-warn-bd: #F3D19C;
+  --sw-acc: #0F766E; --sw-acc-bg: #E6F4F2; --sw-acc-bd: #B7E0DA;
+  --sw-mono-l: 93%; --sw-mono-fg-l: 26%; --sw-mono-s: 70%;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sw-muted: #A1A1AA;
+    --sw-sep: #38383A;
+    --sw-chip-border: #48484A;
+    --sw-danger: #FF8A80; --sw-danger-bg: #3B1C1A; --sw-danger-bd: #6B2B26;
+    --sw-warn: #F5B65A; --sw-warn-bg: #3A2A10; --sw-warn-bd: #6B4E1E;
+    --sw-acc: #2DD4BF; --sw-acc-bg: #10302C; --sw-acc-bd: #1F5C55;
+    --sw-mono-l: 22%; --sw-mono-fg-l: 82%; --sw-mono-s: 35%;
+  }
+}
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.sw-sub { margin: 0 16px; font-size: 0.9375rem; line-height: 1.35; color: var(--sw-muted); }
+.sw-chips { display: flex; gap: 8px; padding: 12px 16px 4px; overflow-x: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.sw-chips::-webkit-scrollbar { display: none; }
+.sw-chip { flex: none; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--sw-chip-border);
+  background: var(--cc-surface, #fff); color: inherit; font: inherit; font-size: 0.9375rem; display: inline-flex; align-items: center; gap: 6px; }
+.sw-chip[aria-pressed="true"] { background: var(--sw-acc); border-color: var(--sw-acc); color: var(--cc-bg, #fff); font-weight: 600; }
+.sw-chip:active { opacity: 0.7; }
+.sw-section { padding: 0 16px; }
+.sw-h2 { margin: 24px 4px 8px; font-size: 1.25rem; line-height: 1.25; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.sw-count { font-size: 0.8125rem; font-weight: 600; color: var(--sw-danger); background: var(--sw-danger-bg); border-radius: 999px; padding: 1px 8px; }
+.sw-group { list-style: none; margin: 0; padding: 0; background: var(--cc-surface, #fff); border-radius: 12px; overflow: hidden; }
+.sw-group > li + li { border-top: 1px solid var(--sw-sep); margin-left: 64px; }
+.sw-group > li + li > .sw-item { margin-left: -64px; }
+.sw-item { width: 100%; display: flex; gap: 12px; padding: 12px 16px; border: 0; background: transparent; color: inherit;
+  text-align: left; font: inherit; align-items: flex-start; }
+.sw-item:active { background: color-mix(in srgb, currentColor 6%, transparent); }
+.sw-mono { flex: none; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.02em;
+  background: hsl(var(--h) var(--sw-mono-s) var(--sw-mono-l)); color: hsl(var(--h) 60% var(--sw-mono-fg-l)); }
+.sw-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sw-meta { font-size: 0.8125rem; line-height: 1.35; color: var(--sw-muted); }
+.sw-title { font-size: 1.0625rem; line-height: 1.3; font-weight: 600; overflow-wrap: anywhere; }
+.sw-sum { font-size: 0.9375rem; line-height: 1.35; color: var(--sw-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sw-badges { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 2px; }
+.sw-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; line-height: 1.35; font-weight: 600;
+  border-radius: 999px; padding: 2px 8px; border: 1px solid var(--sw-chip-border); color: var(--sw-muted); }
+.sw-badge.danger { color: var(--sw-danger); background: var(--sw-danger-bg); border-color: var(--sw-danger-bd); }
+.sw-badge.warn { color: var(--sw-warn); background: var(--sw-warn-bg); border-color: var(--sw-warn-bd); }
+.sw-badge.acc { color: var(--sw-acc); background: var(--sw-acc-bg); border-color: var(--sw-acc-bd); }
+.sw-fold { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 64px; border: 0; background: transparent;
+  color: inherit; text-align: left; font: inherit; }
+.sw-done { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 32px 32px 8px; text-align: center; }
+.sw-done strong { font-size: 1.0625rem; }
+.sw-done span { font-size: 0.9375rem; color: var(--sw-muted); }
+.sw-done i { color: var(--sw-acc); }
+.sw-banner { margin: 12px 16px 0; padding: 12px 14px; border-radius: 12px; background: var(--cc-surface, #fff); border: 1px solid var(--sw-sep);
+  display: flex; gap: 10px; align-items: flex-start; font-size: 0.9375rem; line-height: 1.35; }
+.sw-banner i { color: var(--sw-muted); flex: none; }
+.sw-banner .cc-btn { margin-left: auto; flex: none; }
+.sw-panel { margin: 24px 16px 0; }
+.sw-popular { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px; }
+.sw-label { margin: 28px 20px 12px; font-size: 0.9375rem; font-weight: 600; color: var(--sw-muted); }
+.sw-row { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 8px 12px 8px 16px; }
+.sw-row .sw-body { gap: 0; }
+.sw-row-name { font-size: 1.0625rem; line-height: 1.3; }
+.sw-follow { flex: none; min-height: 44px; min-width: 96px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--sw-acc);
+  background: transparent; color: var(--sw-acc); font: inherit; font-size: 0.9375rem; font-weight: 600; }
+.sw-follow[aria-pressed="true"] { background: var(--sw-acc-bg); border-color: var(--sw-acc-bd); }
+.sw-follow:active { opacity: 0.7; }
+.sw-foot { margin: 16px 20px 32px; font-size: 0.9375rem; color: var(--sw-muted); }
+.sw-foot a, .sw-link { color: var(--sw-acc); font-weight: 600; text-decoration: none; }
+.sw-detail { padding: 8px 16px 32px; display: flex; flex-direction: column; gap: 16px; }
+.sw-detail h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; font-weight: 700; overflow-wrap: anywhere; }
+.sw-card { background: var(--cc-surface, #fff); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.sw-card h2 { margin: 0; font-size: 0.9375rem; font-weight: 600; color: var(--sw-muted); }
+.sw-card p { margin: 0; font-size: 1.0625rem; line-height: 1.45; }
+.sw-why { display: flex; gap: 10px; align-items: flex-start; padding: 0 4px; font-size: 0.9375rem; line-height: 1.35; color: var(--sw-muted); }
+.sw-why i { flex: none; }
+.sw-open { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 12px; background: var(--sw-acc);
+  color: var(--cc-bg, #fff); text-decoration: none; font-size: 1.0625rem; font-weight: 600; }
+.sw-open:active { opacity: 0.8; }
+.sw-hint { margin: 0; text-align: center; font-size: 0.8125rem; color: var(--sw-muted); }
+.sw-skel { height: 76px; margin: 0 16px 8px; border-radius: 12px; }
+[hidden] { display: none !important; }
+@media (hover: hover) and (pointer: fine) {
+  .sw-item:hover, .sw-fold:hover { background: color-mix(in srgb, currentColor 4%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<main class="cc-screen" id="today">
+  <header class="cc-navbar">
+    <span class="cc-spacer"></span>
+    <button class="cc-btn cc-plain" id="refresh" aria-label="Check for updates"><i data-cc-icon="refresh-cw"></i></button>
+    <h1 class="cc-title">Today</h1>
+  </header>
+  <p class="sw-sub" id="today-sub"></p>
+  <div id="today-banner"></div>
+  <div id="today-body"></div>
+</main>
+
+<main class="cc-screen" id="stacks" hidden>
+  <header class="cc-navbar">
+    <h1 class="cc-title">Stacks</h1>
+  </header>
+  <p class="sw-sub" id="stacks-sub"></p>
+  <div style="padding: 12px 16px 0;">
+    <label class="cc-search"><input type="search" id="search" placeholder="Search stacks" aria-label="Search stacks" autocomplete="off" enterkeyhint="search"></label>
+  </div>
+  <div id="stacks-body"></div>
+</main>
+
+<main class="cc-screen" id="detail" hidden>
+  <header class="cc-navbar">
+    <button class="cc-btn cc-plain" data-cc-back>Today</button>
+    <span class="cc-spacer"></span>
+    <button class="cc-btn cc-plain" id="share" aria-label="Share"><i data-cc-icon="share-2"></i></button>
+  </header>
+  <div id="detail-body"></div>
+</main>
+
+<nav class="cc-tabbar">
+  <button data-cc-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
+  <button data-cc-tab="stacks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg>Stacks</button>
+</nav>
+
+<script src="/_cc/lib/ccui-1.0.0.js"></script>
+<script src="/_cc/lib/ccicons-1.0.0.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // The feed is built from the curated catalog by this project's GitHub workflow.
+  var FEED = "https://raw.githubusercontent.com/Blaise-Shyaka/stack-watcher/feed/";
+  var REQUEST_URL = "https://github.com/Blaise-Shyaka/stack-watcher/issues/new?template=stack-request.yml";
+  var DATA_VERSION = 1;
+  var K = { version: "sw.version", follows: "sw.follows", seen: "sw.seen", cache: "sw.cache" };
+  var HOUR = 3600 * 1000, DAY = 24 * HOUR;
+  var STACK_TTL = HOUR, CATALOG_TTL = 6 * HOUR;
+  var POPULAR = ["python", "typescript", "react", "postgresql", "kubernetes", "temporal", "go", "docker"];
+  var GROUPS = [
+    { id: "act", title: "Act on it" },
+    { id: "notable", title: "Notable releases" },
+    { id: "read", title: "Worth reading" }
+  ];
+  var BADGES = {
+    "breaking": ["Breaking change", "warn"], "deprecation": ["Deprecation", "warn"],
+    "first-stable": ["First stable release", "acc"], "major": ["Major release", "acc"],
+    "new-project": ["New project", "acc"], "release": ["Release news", "acc"], "preview": ["Preview", ""],
+    "official": ["Official", ""], "community": ["Community source", ""]
+  };
+
+  // --- storage --------------------------------------------------------------
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
+  }
+
+  function migrate() {
+    var v = load(K.version, null);
+    if (v === null) save(K.version, DATA_VERSION);
+  }
+  migrate();
+
+  var state = {
+    follows: load(K.follows, []),
+    seen: load(K.seen, {}),
+    cache: load(K.cache, { catalog: null, stacks: {} }),
+    filter: "all",
+    status: "idle",          // idle | loading | ok | offline | error
+    catalogStatus: "idle",
+    routineOpen: false,
+    query: "",
+    current: null
+  };
+  if (!Array.isArray(state.follows)) state.follows = [];
+  if (!state.cache || typeof state.cache !== "object") state.cache = { catalog: null, stacks: {} };
+  if (!state.cache.stacks) state.cache.stacks = {};
+
+  function saveFollows() { save(K.follows, state.follows); }
+  function saveSeen() { save(K.seen, state.seen); }
+  function saveCache() {
+    var keep = {};
+    state.follows.forEach(function (id) { if (state.cache.stacks[id]) keep[id] = state.cache.stacks[id]; });
+    state.cache.stacks = keep;
+    if (!save(K.cache, state.cache)) {
+      // Storage full: keep the catalog and drop item caches, they come back on the next fetch.
+      save(K.cache, { catalog: state.cache.catalog, stacks: {} });
+    }
+  }
+
+  // --- the briefing day -------------------------------------------------------
+  function localDay(t) {
+    var d = new Date(t);
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+  function startDay() {
+    var now = Date.now(), today = localDay(now);
+    if (state.seen.day !== today) {
+      state.seen.since = state.seen.lastOpenAt || new Date(now - 14 * DAY).toISOString();
+      state.seen.day = today;
+    }
+    state.seen.lastOpenAt = new Date(now).toISOString();
+    if (!state.seen.opened) state.seen.opened = {};
+    saveSeen();
+  }
+
+  // --- helpers ---------------------------------------------------------------
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === "text") el.textContent = v;
+      else if (k === "class") el.className = v;
+      else if (k === "style") el.setAttribute("style", v);
+      else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c === null || c === undefined || c === false) continue;
+      if (Array.isArray(c)) c.forEach(function (x) { if (x) el.appendChild(x); });
+      else el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return el;
+  }
+  function icon(name, size) {
+    var i = h("i", { "data-cc-icon": name, "aria-hidden": "true" });
+    if (size) i.setAttribute("data-cc-size", String(size));
+    return i;
+  }
+  function fillIcons(el) { if (window.ccIcons && ccIcons.fill) ccIcons.fill(el); }
+  function catalogStacks() { return (state.cache.catalog && state.cache.catalog.data && state.cache.catalog.data.stacks) || []; }
+  function stackById(id) {
+    var s = catalogStacks().filter(function (x) { return x.id === id; })[0];
+    return s || { id: id, name: id, mono: id.slice(0, 2), hue: 200 };
+  }
+  function mono(stack) {
+    return h("span", { class: "sw-mono", "aria-hidden": "true", style: "--h: " + (Number(stack.hue) || 0) }, stack.mono || stack.name.slice(0, 2));
+  }
+  function ago(ts) {
+    var d = Date.now() - ts;
+    if (d < HOUR) return Math.max(1, Math.round(d / 60000)) + "m";
+    if (d < DAY) return Math.round(d / HOUR) + "h";
+    if (d < 7 * DAY) return Math.round(d / DAY) + "d";
+    return new Date(ts).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  }
+  function clock(iso) {
+    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  function host(url) { try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return ""; } }
+  function list(names) {
+    if (names.length <= 1) return names.join("");
+    if (names.length <= 3) return names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+    return names.slice(0, 3).join(", ") + " and " + (names.length - 3) + " more";
+  }
+  function sourceName(item) {
+    return item.source === "GitHub Advisory Database" ? "Security advisory" : item.source;
+  }
+  function badgeEls(item) {
+    var out = [];
+    if (item.kind === "security" || item.badges.indexOf("security") >= 0) {
+      var sev = item.severity ? item.severity.charAt(0).toUpperCase() + item.severity.slice(1) + " severity" : "Security";
+      out.push(h("span", { class: "sw-badge danger" }, icon("circle-alert", 12), sev));
+    }
+    if (item.cve) out.push(h("span", { class: "sw-badge" }, item.cve));
+    item.badges.forEach(function (b) {
+      var spec = BADGES[b];
+      if (spec) out.push(h("span", { class: "sw-badge " + spec[1] }, spec[0]));
+    });
+    return out;
+  }
+
+  // --- fetching ------------------------------------------------------------------
+  function getJSON(path) {
+    return fetch(FEED + path, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+  function stale(entry, ttl) { return !entry || !entry.fetchedAt || Date.now() - Date.parse(entry.fetchedAt) > ttl; }
+
+  function loadCatalog(force) {
+    if (!force && !stale(state.cache.catalog, CATALOG_TTL)) return Promise.resolve(true);
+    state.catalogStatus = "loading";
+    return fetch(FEED + "catalog.json", { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (data) {
+      state.cache.catalog = { fetchedAt: new Date().toISOString(), data: data };
+      state.catalogStatus = "ok";
+      saveCache();
+      return true;
+    }).catch(function () {
+      state.catalogStatus = "error";
+      return false;
+    });
+  }
+
+  function loadStack(id, force) {
+    if (!force && !stale(state.cache.stacks[id], STACK_TTL)) return Promise.resolve(true);
+    return fetch(FEED + "stacks/" + encodeURIComponent(id) + ".json", { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (data) {
+      state.cache.stacks[id] = { fetchedAt: new Date().toISOString(), data: data };
+      return true;
+    }).catch(function () { return false; });
+  }
+
+  function refresh(force) {
+    state.status = "loading";
+    renderToday();
+    return loadCatalog(force).then(function (catalogOk) {
+      return Promise.all(state.follows.map(function (id) { return loadStack(id, force); })).then(function (oks) {
+        var allOk = catalogOk && oks.every(Boolean);
+        state.status = allOk ? "ok" : (navigator.onLine === false ? "offline" : "error");
+        saveCache();
+        renderAll();
+      });
+    });
+  }
+
+  // --- the briefing ------------------------------------------------------------------
+  function collect() {
+    var since = Date.parse(state.seen.since || 0) || 0;
+    var weekAgo = Date.now() - 7 * DAY;
+    var seenIds = {}, fresh = [], earlier = [];
+    state.follows.forEach(function (id) {
+      var entry = state.cache.stacks[id];
+      if (!entry || !entry.data || !entry.data.items) return;
+      entry.data.items.forEach(function (it) {
+        if (seenIds[it.id]) return;
+        seenIds[it.id] = true;
+        var ts = Date.parse(it.publishedAt || it.firstSeenAt) || 0;
+        var item = Object.assign({}, it, { stackId: id, ts: ts, badges: it.badges || [] });
+        if (ts > since) fresh.push(item);
+        else if (ts > weekAgo && (it.group === "act" || it.group === "notable")) earlier.push(item);
+      });
+    });
+    return { fresh: fresh, earlier: earlier };
+  }
+  function byGroup(items) {
+    var g = { act: [], notable: [], read: [], routine: [] };
+    items.forEach(function (it) { (g[it.group] || g.read).push(it); });
+    g.act.sort(function (a, b) { return (b.score - a.score) || (b.ts - a.ts); });
+    ["notable", "read", "routine"].forEach(function (k) { g[k].sort(function (a, b) { return b.ts - a.ts; }); });
+    return g;
+  }
+
+  function itemRow(item) {
+    var stack = stackById(item.stackId);
+    var btn = h("button", { class: "sw-item", onclick: function () { showDetail(item); } },
+      mono(stack),
+      h("span", { class: "sw-body" },
+        h("span", { class: "sw-meta" }, stack.name + " · " + sourceName(item) + " · " + ago(item.ts)),
+        h("span", { class: "sw-title" }, item.title),
+        item.summary ? h("span", { class: "sw-sum" }, item.summary) : null,
+        h("span", { class: "sw-badges" }, badgeEls(item))
+      )
+    );
+    return h("li", null, btn);
+  }
+
+  function section(id, title, items, countBadge) {
+    return h("section", { class: "sw-section", "aria-labelledby": "h-" + id },
+      h("h2", { class: "sw-h2", id: "h-" + id }, title, countBadge ? h("span", { class: "sw-count" }, String(items.length)) : null),
+      h("ul", { class: "sw-group" }, items.map(itemRow))
+    );
+  }
+
+  function renderFirstRun(body) {
+    var panel = h("div", { class: "cc-empty sw-panel" },
+      h("strong", null, "Your briefing starts with your stacks"),
+      h("span", null, "Follow the tools you work with. Each morning you'll see what changed in them: releases, security fixes and posts from their own teams."),
+      h("button", { class: "cc-btn", onclick: function () { showTab("stacks"); } }, "Choose stacks")
+    );
+    body.appendChild(panel);
+    var known = catalogStacks();
+    var picks = POPULAR.map(function (id) { return known.filter(function (s) { return s.id === id; })[0]; }).filter(Boolean);
+    if (picks.length) {
+      body.appendChild(h("p", { class: "sw-label" }, "Or start with a popular one"));
+      body.appendChild(h("div", { class: "sw-popular" }, picks.map(function (s) {
+        return h("button", { class: "sw-chip", "aria-pressed": "false", "aria-label": "Follow " + s.name,
+          onclick: function () { toggleFollow(s.id); } }, icon("plus", 16), s.name);
+      })));
+    } else if (state.catalogStatus === "error") {
+      body.appendChild(h("p", { class: "sw-foot" }, "The list of stacks couldn't be loaded. Check your connection, then try again."));
+    }
+  }
+
+  function renderBanner() {
+    var box = document.getElementById("today-banner");
+    box.textContent = "";
+    var times = state.follows.map(function (id) { return state.cache.stacks[id] && state.cache.stacks[id].fetchedAt; }).filter(Boolean).sort();
+    var when = times.length ? clock(times[0]) : null;
+    if (state.status === "offline" || state.status === "error") {
+      var msg = state.status === "offline"
+        ? (when ? "You're offline. This is the briefing from " + when + "; it updates when you're back online." : "You're offline. Your briefing loads when you're back online.")
+        : (when ? "Couldn't reach the feed. This is the briefing from " + when + "." : "Couldn't reach the feed. Check your connection and try again.");
+      box.appendChild(h("div", { class: "sw-banner", role: "status" },
+        icon(state.status === "offline" ? "wifi-off" : "circle-alert", 20), h("span", null, msg),
+        h("button", { class: "cc-btn cc-plain", onclick: function () { refresh(true); } }, "Try again")));
+    }
+  }
+
+  function renderToday() {
+    var sub = document.getElementById("today-sub");
+    var body = document.getElementById("today-body");
+    body.textContent = "";
+    var dateText = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+    renderBanner();
+
+    if (!state.follows.length) {
+      sub.textContent = dateText;
+      renderFirstRun(body);
+      fillIcons(body);
+      window.appState = snapshot(null);
+      return;
+    }
+
+    var hasData = state.follows.some(function (id) { return state.cache.stacks[id]; });
+    if (!hasData && state.status === "loading") {
+      sub.textContent = dateText;
+      for (var i = 0; i < 4; i++) body.appendChild(h("div", { class: "cc-skeleton sw-skel" }));
+      window.appState = snapshot(null);
+      return;
+    }
+
+    var all = collect();
+    var stacksInDay = {};
+    all.fresh.forEach(function (it) { stacksInDay[it.stackId] = true; });
+    var nStacks = Object.keys(stacksInDay).length;
+    sub.textContent = dateText + " · " + (all.fresh.length
+      ? all.fresh.length + (all.fresh.length === 1 ? " update" : " updates") + " across " + nStacks + (nStacks === 1 ? " stack" : " stacks")
+      : "nothing new yet");
+
+    // Stack filter chips
+    var followed = state.follows.map(stackById).sort(function (a, b) { return a.name.localeCompare(b.name); });
+    if (followed.length > 1) {
+      if (state.filter !== "all" && state.follows.indexOf(state.filter) < 0) state.filter = "all";
+      var chips = [{ id: "all", name: "All" }].concat(followed);
+      body.appendChild(h("nav", { class: "sw-chips", "aria-label": "Show one stack" }, chips.map(function (s) {
+        return h("button", { class: "sw-chip", "aria-pressed": String(state.filter === s.id),
+          onclick: function () { state.filter = s.id; state.routineOpen = false; renderToday(); } }, s.name);
+      })));
+    }
+    var items = all.fresh.filter(function (it) { return state.filter === "all" || it.stackId === state.filter; });
+    var g = byGroup(items);
+    var first = null;
+
+    GROUPS.forEach(function (grp) {
+      if (!g[grp.id].length) return;
+      if (!first) first = grp.id;
+      body.appendChild(section(grp.id, grp.title, g[grp.id], grp.id === "act"));
+    });
+
+    if (g.routine.length) {
+      if (!first) first = "routine";
+      var names = [];
+      g.routine.forEach(function (it) { var n = stackById(it.stackId).name; if (names.indexOf(n) < 0) names.push(n); });
+      var fold = h("button", { class: "sw-fold", "aria-expanded": String(state.routineOpen),
+          onclick: function () { state.routineOpen = !state.routineOpen; renderToday(); } },
+        h("span", { class: "sw-body" },
+          h("span", { class: "sw-title" }, g.routine.length + (g.routine.length === 1 ? " routine update" : " routine updates")),
+          h("span", { class: "sw-sum" }, "Minor and patch releases in " + list(names))),
+        icon(state.routineOpen ? "chevron-up" : "chevron-down", 20));
+      var wrap = h("section", { class: "sw-section", "aria-label": "Routine updates", style: "margin-top: 24px" },
+        h("div", { class: "sw-group" }, fold));
+      body.appendChild(wrap);
+      if (state.routineOpen) {
+        wrap.appendChild(h("ul", { class: "sw-group", style: "margin-top: 8px" }, g.routine.map(itemRow)));
+      }
+    }
+
+    if (!items.length) {
+      body.appendChild(h("div", { class: "cc-empty sw-panel" },
+        h("strong", null, state.filter === "all" ? "Nothing new in your stacks" : "Nothing new in " + stackById(state.filter).name),
+        h("span", null, "New releases, advisories and posts show here as soon as the feed picks them up.")));
+      var earlier = byGroup(all.earlier.filter(function (it) { return state.filter === "all" || it.stackId === state.filter; }));
+      var earlierItems = earlier.act.concat(earlier.notable).slice(0, 8);
+      if (earlierItems.length) body.appendChild(section("earlier", "Earlier this week", earlierItems, false));
+    } else {
+      body.appendChild(h("div", { class: "sw-done" }, icon("circle-check", 28),
+        h("strong", null, "You're caught up"),
+        h("span", null, "Tomorrow's briefing is ready the first time you open the app.")));
+    }
+    fillIcons(body);
+    fillIcons(document.getElementById("today-banner"));
+    window.appState = snapshot(first);
+  }
+
+  function snapshot(firstGroup) {
+    return { follows: state.follows.slice(), firstGroup: firstGroup, status: state.status };
+  }
+
+  // --- detail ------------------------------------------------------------------------
+  function whyText(item, stack) {
+    if (item.kind === "security") return "You follow " + stack.name + ", and this advisory affects one of its packages.";
+    if (item.group === "act") return "You follow " + stack.name + ". Breaking changes and removals always make your briefing.";
+    if (item.badges.indexOf("first-stable") >= 0) return "You follow " + stack.name + ". A first stable release always makes your briefing.";
+    if (item.badges.indexOf("new-project") >= 0) return "You follow " + stack.name + ". A new project's first release always makes your briefing.";
+    if (item.group === "notable") return "You follow " + stack.name + ". Major releases always make your briefing.";
+    if (item.group === "routine") return "You follow " + stack.name + ". Minor and patch releases are folded into routine updates.";
+    return "An official post from " + stack.name + ", which you follow.";
+  }
+
+  function showDetail(item) {
+    state.current = item;
+    state.seen.opened = state.seen.opened || {};
+    state.seen.opened[item.id] = new Date().toISOString();
+    var ids = Object.keys(state.seen.opened);
+    if (ids.length > 300) ids.slice(0, ids.length - 300).forEach(function (k) { delete state.seen.opened[k]; });
+    saveSeen();
+    var stack = stackById(item.stackId);
+    var body = document.getElementById("detail-body");
+    body.textContent = "";
+    var when = new Date(item.ts).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+    var site = host(item.url);
+    body.appendChild(h("article", { class: "sw-detail" },
+      h("div", { style: "display:flex;flex-direction:column;gap:8px" },
+        h("div", { style: "display:flex;align-items:center;gap:10px" }, mono(stack),
+          h("span", { class: "sw-meta", style: "font-size:0.9375rem" }, stack.name + " · " + sourceName(item))),
+        h("h1", null, item.title),
+        h("div", { class: "sw-badges" }, badgeEls(item)),
+        h("p", { class: "sw-meta", style: "margin:0" }, (item.kind === "release" ? "Released " : "Published ") + when + (site ? " · " + site : ""))
+      ),
+      item.summary ? h("section", { class: "sw-card", "aria-labelledby": "in-short" },
+        h("h2", { id: "in-short" }, "In short"), h("p", null, item.summary)) : null,
+      h("p", { class: "sw-why" }, icon("info", 18), h("span", null, "Why you're seeing this: " + whyText(item, stack))),
+      item.url ? h("a", { class: "sw-open", href: item.url, target: "_blank", rel: "noopener noreferrer" },
+        item.kind === "release" ? "Read the release notes" : (item.kind === "security" ? "Read the advisory" : "Read on " + (site || "the source")),
+        icon("link", 18)) : null,
+      item.url ? h("p", { class: "sw-hint" }, "Opens " + (site || "the source") + " in your browser") : null
+    ));
+    fillIcons(body);
+    if (window.ccUI && ccUI.push) ccUI.push("detail");
+    else { document.getElementById("today").hidden = true; document.getElementById("detail").hidden = false; }
+  }
+
+  document.getElementById("share").addEventListener("click", function () {
+    var it = state.current;
+    if (!it || !it.url) return;
+    if (navigator.share) {
+      navigator.share({ title: it.title, url: it.url }).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(it.url).then(function () { toast("Link copied"); });
+    }
+  });
+
+  // --- stacks ---------------------------------------------------------------------------
+  function toast(msg, opts) { if (window.ccUI && ccUI.toast) ccUI.toast(msg, opts || {}); }
+
+  function toggleFollow(id) {
+    var i = state.follows.indexOf(id);
+    var name = stackById(id).name;
+    if (i >= 0) {
+      state.follows.splice(i, 1);
+      saveFollows(); saveCache(); renderAll();
+      toast("Unfollowed " + name, { action: "Undo", onAction: function () {
+        if (state.follows.indexOf(id) < 0) { state.follows.splice(i, 0, id); saveFollows(); loadStack(id).then(function () { saveCache(); renderAll(); }); renderAll(); }
+      } });
+    } else {
+      state.follows.push(id);
+      saveFollows(); renderAll();
+      loadStack(id).then(function (ok) {
+        if (!ok && state.status !== "offline") state.status = navigator.onLine === false ? "offline" : "error";
+        saveCache(); renderAll();
+      });
+    }
+  }
+
+  function stackRow(s) {
+    var on = state.follows.indexOf(s.id) >= 0;
+    var kinds = (s.kinds || []).map(function (k) {
+      return { blog: "blog", release: "releases", changelog: "changelog", security: "security" }[k] || k;
+    });
+    return h("li", null, h("div", { class: "sw-row" }, mono(s),
+      h("span", { class: "sw-body" },
+        h("span", { class: "sw-row-name" }, s.name),
+        h("span", { class: "sw-meta" }, kinds.join(" · "))),
+      h("button", { class: "sw-follow", "aria-pressed": String(on), "aria-label": (on ? "Unfollow " : "Follow ") + s.name,
+        onclick: function () { toggleFollow(s.id); } }, on ? "Following" : "Follow")));
+  }
+
+  function matches(s, q) {
+    if (!q) return true;
+    var hay = [s.name, s.id].concat(s.aliases || []).join(" ").toLowerCase();
+    return q.toLowerCase().split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
+  }
+
+  function requestBlock(query) {
+    return h("div", { class: "cc-empty sw-panel" },
+      h("strong", null, query ? "No stack called “" + query + "” yet" : "Missing a stack?"),
+      h("span", null, "Every stack here is added by hand, from its official blog, release notes and security advisories. Ask for it and we'll review it."),
+      h("a", { class: "cc-btn", href: REQUEST_URL, target: "_blank", rel: "noopener noreferrer" }, "Request it on GitHub"),
+      h("span", { class: "sw-hint" }, "Opens a short form on GitHub. You need a GitHub account."));
+  }
+
+  function renderStacks() {
+    var body = document.getElementById("stacks-body");
+    var sub = document.getElementById("stacks-sub");
+    body.textContent = "";
+    var all = catalogStacks();
+    if (!all.length) {
+      sub.textContent = "";
+      if (state.catalogStatus === "loading" || state.catalogStatus === "idle") {
+        for (var i = 0; i < 5; i++) body.appendChild(h("div", { class: "cc-skeleton sw-skel", style: "height:60px" }));
+      } else {
+        body.appendChild(h("div", { class: "cc-error sw-panel" },
+          h("strong", null, "Couldn't load the list of stacks"),
+          h("span", null, "Check your connection, then try again."),
+          h("button", { class: "cc-btn", onclick: function () { loadCatalog(true).then(renderAll); renderStacks(); } }, "Try again")));
+      }
+      return;
+    }
+    sub.textContent = "Following " + state.follows.length + " of " + all.length;
+    document.getElementById("search").placeholder = "Search " + all.length + " stacks";
+    var q = state.query.trim();
+    if (q) {
+      var found = all.filter(function (s) { return matches(s, q); });
+      if (found.length) {
+        body.appendChild(h("section", { class: "sw-section" },
+          h("h2", { class: "sw-h2" }, found.length === 1 ? "1 match" : found.length + " matches"),
+          h("ul", { class: "sw-group" }, found.map(stackRow))));
+        body.appendChild(h("p", { class: "sw-foot" }, "Not what you're after? ",
+          h("a", { href: REQUEST_URL, target: "_blank", rel: "noopener noreferrer" }, "Request a stack")));
+      } else {
+        body.appendChild(requestBlock(q));
+      }
+      fillIcons(body);
+      return;
+    }
+    var following = all.filter(function (s) { return state.follows.indexOf(s.id) >= 0; });
+    if (following.length) {
+      body.appendChild(h("section", { class: "sw-section" },
+        h("h2", { class: "sw-h2" }, "Following"),
+        h("ul", { class: "sw-group" }, following.map(stackRow))));
+    }
+    var cats = (state.cache.catalog.data.categories || []);
+    cats.forEach(function (c) {
+      var inCat = all.filter(function (s) { return s.category === c.id; });
+      if (!inCat.length) return;
+      body.appendChild(h("section", { class: "sw-section" },
+        h("h2", { class: "sw-h2" }, c.name),
+        h("ul", { class: "sw-group" }, inCat.map(stackRow))));
+    });
+    body.appendChild(h("p", { class: "sw-foot" }, "Missing a stack? ",
+      h("a", { href: REQUEST_URL, target: "_blank", rel: "noopener noreferrer" }, "Request it")));
+    fillIcons(body);
+  }
+
+  document.getElementById("search").addEventListener("input", function (e) {
+    state.query = e.target.value;
+    renderStacks();
+  });
+  document.getElementById("refresh").addEventListener("click", function () { refresh(true); });
+
+  function showTab(id) {
+    if (window.ccUI && ccUI.tabs) ccUI.tabs().show(id);
+    else ["today", "stacks"].forEach(function (s) { document.getElementById(s).hidden = s !== id; });
+  }
+
+  function renderAll() { renderToday(); renderStacks(); }
+
+  window.addEventListener("online", function () { refresh(false); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") { startDay(); refresh(false); }
+  });
+
+  startDay();
+  renderAll();
+  fillIcons(document.body);
+  refresh(false);
+})();
+</script>
+</body>
+</html>

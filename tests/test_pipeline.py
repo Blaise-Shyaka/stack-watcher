@@ -95,9 +95,26 @@ def test_release_summary_drops_pr_noise():
     assert C.release_summary(html, "v1.0.0") == "Remove public preview warnings; Stabilize the API."
 
 
+def test_release_summary_skips_headings():
+    html = "<h2>Highlights</h2><h3>Added</h3><ul><li>Header encoding option</li></ul>"
+    assert C.release_summary(html, "v0.4.0") == "Header encoding option."
+
+
 def test_sentence_summary_is_short():
     s = C.sentence_summary("<p>" + "One sentence here. " * 40 + "</p>")
     assert len(s) <= C.SUMMARY_MAX
+
+
+def test_review_fixes():
+    # 0.x minor with breaking notes stays routine; Flutter-style pre-release is hidden
+    assert C.classify_release("v0.4.0", "BREAKING: renamed", None).group == "routine"
+    assert C.parse_version("3.51.0-0.1.pre").pre
+    # "no breaking changes" in a title is not a breaking change
+    assert C.classify_post("React Native 0.88 - Variable Fonts, no breaking changes", "", "blog").group != "act"
+    # a changelog launch that isn't GA is ordinary reading
+    assert C.classify_post("Model X now available on AI Gateway", "", "changelog").group == "read"
+    assert display_title({"name": "NATS"}, {}, "Release v2.14.10", "") == "NATS 2.14.10"
+    assert display_title({"name": "Prometheus"}, {}, "3.16.0 / 2026-11-04", "") == "Prometheus 3.16.0"
 
 
 def test_display_title():

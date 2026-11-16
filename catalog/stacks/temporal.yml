@@ -7,16 +7,19 @@ hue: 265
 homepage: https://temporal.io
 sources:
   - kind: blog
-    url: https://temporal.io/blog/rss.xml
+    url: https://community.temporal.io/c/announcements.rss
+    label: Community announcements
   - kind: release
     url: https://github.com/temporalio/temporal/releases.atom
     label: Server
+    title_match: '^v\d+\.\d+\.\d+$'
   - kind: release
     url: https://github.com/temporalio/cli/releases.atom
     label: CLI
   - kind: release
     url: https://github.com/temporalio/sdk-go/releases.atom
     label: Go SDK
+    title_match: '^v\d'
   - kind: release
     url: https://github.com/temporalio/sdk-java/releases.atom
     label: Java SDK
