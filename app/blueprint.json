@@ -13,7 +13,7 @@
   "screens": [
     {
       "id": "today",
-      "says": "Today's briefing: what changed in the stacks you follow, in four groups (Act on it, Notable releases, Worth reading, routine updates), ending with You're caught up.",
+      "says": "Today's briefing: what changed in the stacks you follow, in four groups (Act on it, Notable releases, Worth reading, routine updates). Items you mark done move to Done today; opened ones are dimmed. Ends with You're caught up.",
       "states": {
         "empty": "Asks you to choose the stacks you work with, with popular ones to follow in one tap.",
         "loading": "Shows the last briefing, or placeholder rows the very first time.",
@@ -27,17 +27,21 @@
     },
     {
       "id": "stacks",
-      "says": "Search the curated list of stacks by name or alias, follow and unfollow them, and request one that isn't there.",
+      "says": "Search the curated list by name or alias, see the stacks you follow and popular ones, browse by category, and request a stack that isn't there.",
       "states": {
         "empty": "When a search finds nothing, offers to request the stack on GitHub.",
         "loading": "Placeholder rows while the list loads.",
         "offline": "Shows the list from last time.",
         "error": "Says the list of stacks couldn't be loaded and offers Try again."
       }
+    },
+    {
+      "id": "category",
+      "says": "The stacks in one category, each with a Follow button, and a link to request a missing one."
     }
   ],
   "data": {
-    "version": 1,
+    "version": 2,
     "keeps": [
       {
         "key": "sw.version",
@@ -49,12 +53,11 @@
       },
       {
         "key": "sw.seen",
-        "what": "When you last opened the app and which items you opened, to know what's new",
+        "what": "When you last opened the app, to know what's new since then",
         "shape": {
           "day": "text",
           "since": "date",
-          "lastOpenAt": "date",
-          "opened": "object"
+          "lastOpenAt": "date"
         }
       },
       {
@@ -63,6 +66,14 @@
         "shape": {
           "catalog": "object",
           "stacks": "object"
+        }
+      },
+      {
+        "key": "sw.items",
+        "what": "For each item you opened or marked done, when you did (kept for 45 days)",
+        "shape": {
+          "opened": "date",
+          "done": "date"
         }
       }
     ]
@@ -87,6 +98,10 @@
         {
           "id": "J-1.4",
           "text": "On first open, follow several popular stacks in one go, then open my briefing"
+        },
+        {
+          "id": "J-1.5",
+          "text": "Browse stacks by category and follow one from there"
         }
       ]
     },
@@ -105,6 +120,10 @@
         {
           "id": "J-2.3",
           "text": "Find the link to the item's source"
+        },
+        {
+          "id": "J-2.4",
+          "text": "Mark an item as done so it leaves today's briefing, and move it back if I change my mind"
         }
       ]
     },
@@ -142,6 +161,11 @@
     {
       "id": "P-2",
       "text": "Security advisories and breaking changes always come first in the briefing."
+    },
+    {
+      "id": "P-3",
+      "kind": "data",
+      "text": "Items you've opened or marked done stay that way when the app is closed or updated."
     }
   ],
   "network": [

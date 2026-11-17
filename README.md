@@ -32,3 +32,15 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 ```
 
 More in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/DESIGN.md](docs/DESIGN.md).
+
+## Testing the app locally
+
+`app/tests.json` holds the app's CloudCrane tests (the same ones CloudCrane runs in its
+browser). `tools/run-app-tests.js` replays them in Chromium against `app/index.html`, with a
+stand-in for CloudCrane's UI kit and a frozen clock like CloudCrane's:
+
+```bash
+node tools/run-app-tests.js            # all tests
+node tools/run-app-tests.js T-9        # one test
+APP_PREV=old.html node tools/run-app-tests.js T-10   # data test: setup in old, check in new
+```

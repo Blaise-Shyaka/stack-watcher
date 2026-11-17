@@ -40,8 +40,16 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .sw-h2 { margin: 24px 4px 8px; font-size: 1.25rem; line-height: 1.25; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .sw-count { font-size: 0.8125rem; font-weight: 600; color: var(--sw-danger); background: var(--sw-danger-bg); border-radius: 999px; padding: 1px 8px; }
 .sw-group { list-style: none; margin: 0; padding: 0; background: var(--cc-surface, #fff); border-radius: 12px; overflow: hidden; }
-.sw-group > li + li { border-top: 1px solid var(--sw-sep); margin-left: 64px; }
-.sw-group > li + li > .sw-item { margin-left: -64px; }
+.sw-group > li { position: relative; }
+.sw-group > li + li::before { content: ""; position: absolute; top: 0; left: 64px; right: 0; border-top: 1px solid var(--sw-sep); }
+.sw-group.sw-plain > li + li::before { left: 16px; }
+.sw-catrow { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px 8px 16px; border: 0;
+  background: transparent; color: inherit; font: inherit; text-align: left; }
+.sw-catrow:active { background: color-mix(in srgb, currentColor 6%, transparent); }
+.sw-catrow .sw-body { gap: 0; }
+.sw-catrow i { color: var(--sw-muted); flex: none; }
+.sw-opened .sw-title { color: var(--sw-muted); font-weight: 500; }
+.sw-actions { display: flex; flex-direction: column; gap: 8px; }
 .sw-item { width: 100%; display: flex; gap: 12px; padding: 12px 16px; border: 0; background: transparent; color: inherit;
   text-align: left; font: inherit; align-items: flex-start; }
 .sw-item:active { background: color-mix(in srgb, currentColor 6%, transparent); }
@@ -125,9 +133,17 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   <div id="stacks-body"></div>
 </main>
 
+<main class="cc-screen" id="category" hidden>
+  <header class="cc-navbar">
+    <button class="cc-btn cc-plain" id="category-back">Stacks</button>
+    <h1 class="cc-title" id="category-title">Category</h1>
+  </header>
+  <div id="category-body"></div>
+</main>
+
 <main class="cc-screen" id="detail" hidden>
   <header class="cc-navbar">
-    <button class="cc-btn cc-plain" data-cc-back>Today</button>
+    <button class="cc-btn cc-plain" id="detail-back">Today</button>
     <span class="cc-spacer"></span>
     <button class="cc-btn cc-plain" id="share" aria-label="Share"><i data-cc-icon="share-2"></i></button>
   </header>
@@ -148,8 +164,9 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   // The feed is built from the curated catalog by this project's GitHub workflow.
   var FEED = "https://raw.githubusercontent.com/Blaise-Shyaka/stack-watcher/feed/";
   var REQUEST_URL = "https://github.com/Blaise-Shyaka/stack-watcher/issues/new?template=stack-request.yml";
-  var DATA_VERSION = 1;
-  var K = { version: "sw.version", follows: "sw.follows", seen: "sw.seen", cache: "sw.cache" };
+  var DATA_VERSION = 2;
+  var K = { version: "sw.version", follows: "sw.follows", seen: "sw.seen", cache: "sw.cache", items: "sw.items" };
+  var ITEM_DAYS = 45;
   var HOUR = 3600 * 1000, DAY = 24 * HOUR;
   var STACK_TTL = HOUR, CATALOG_TTL = 6 * HOUR;
   var POPULAR = ["python", "typescript", "react", "nextjs", "postgresql", "kubernetes", "temporal", "docker"];
@@ -173,9 +190,22 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
   }
 
+  // Data version 2 keeps one record per item ({ opened, done }) in sw.items.
+  // Version 1 kept only opened items, in sw.seen.opened: move them over.
   function migrate() {
     var v = load(K.version, null);
-    if (v === null) save(K.version, DATA_VERSION);
+    if (v !== null && v >= DATA_VERSION) return;
+    var seen = load(K.seen, {}) || {}, items = load(K.items, {}) || {};
+    if (seen.opened && typeof seen.opened === "object") {
+      Object.keys(seen.opened).forEach(function (id) {
+        items[id] = items[id] || {};
+        if (!items[id].opened) items[id].opened = seen.opened[id];
+      });
+      delete seen.opened;
+      save(K.seen, seen);
+    }
+    save(K.items, items);
+    save(K.version, DATA_VERSION);
   }
   migrate();
 
@@ -183,6 +213,8 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     follows: load(K.follows, []),
     seen: load(K.seen, {}),
     cache: load(K.cache, { catalog: null, stacks: {} }),
+    items: load(K.items, {}),
+    doneOpen: false,
     filter: "all",
     status: "idle",          // idle | loading | ok | offline | error
     catalogStatus: "idle",
@@ -197,6 +229,21 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 
   function saveFollows() { save(K.follows, state.follows); }
   function saveSeen() { save(K.seen, state.seen); }
+  function saveItems() {
+    var cutoff = Date.now() - ITEM_DAYS * DAY;
+    Object.keys(state.items).forEach(function (id) {
+      var r = state.items[id], last = Math.max(Date.parse(r.opened || 0) || 0, Date.parse(r.done || 0) || 0);
+      if (last < cutoff) delete state.items[id];
+    });
+    save(K.items, state.items);
+  }
+  function record(id) { return state.items[id] || {}; }
+  function setDone(item, done) {
+    var r = state.items[item.id] = state.items[item.id] || {};
+    if (done) r.done = new Date().toISOString(); else delete r.done;
+    saveItems();
+    renderToday();
+  }
   function saveCache() {
     var keep = {};
     state.follows.forEach(function (id) { if (state.cache.stacks[id]) keep[id] = state.cache.stacks[id]; });
@@ -219,7 +266,6 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       state.seen.day = today;
     }
     state.seen.lastOpenAt = new Date(now).toISOString();
-    if (!state.seen.opened) state.seen.opened = {};
     saveSeen();
   }
 
@@ -363,16 +409,26 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 
   function itemRow(item) {
     var stack = stackById(item.stackId);
-    var btn = h("button", { class: "sw-item", onclick: function () { showDetail(item); } },
+    var rec = record(item.id);
+    var btn = h("button", { class: "sw-item" + (rec.opened ? " sw-opened" : ""), onclick: function () { showDetail(item); } },
       mono(stack),
       h("span", { class: "sw-body" },
-        h("span", { class: "sw-meta" }, stack.name + " · " + sourceName(item) + " · " + ago(item.ts)),
+        h("span", { class: "sw-meta" }, stack.name + " · " + sourceName(item) + " · " + ago(item.ts) + (rec.opened ? " · Opened" : "")),
         h("span", { class: "sw-title" }, item.title),
         item.summary ? h("span", { class: "sw-sum" }, item.summary) : null,
         h("span", { class: "sw-badges" }, badgeEls(item))
       )
     );
-    return h("li", null, btn);
+    var li = h("li", null, btn);
+    if (window.ccUI && ccUI.swipe) {
+      ccUI.swipe(li, [{ label: rec.done ? "Not done" : "Done", onAction: function () { markDone(item, !rec.done); } }]);
+    }
+    return li;
+  }
+
+  function markDone(item, done) {
+    setDone(item, done);
+    if (done) toast("Marked as done", { action: "Undo", onAction: function () { setDone(item, false); } });
   }
 
   function section(id, title, items, countBadge) {
@@ -383,28 +439,25 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   }
 
   function renderFirstRun(body) {
+    var n = state.follows.length;
     var panel = h("div", { class: "cc-empty sw-panel" },
       h("strong", null, "Your briefing starts with your stacks"),
-      h("span", null, "Follow the tools you work with. Each morning you'll see what changed in them: releases, security fixes and posts from their own teams."),
-      h("button", { class: "cc-btn", onclick: function () { showTab("stacks"); } }, "Choose stacks")
+      h("span", null, n
+        ? "Following " + n + ". Your first briefing covers the last 14 days."
+        : "Follow the tools you work with. Each morning you'll see what changed in them: releases, security fixes and posts from their own teams."),
+      n ? h("button", { class: "cc-btn", onclick: function () { state.onboarding = false; renderToday(); } }, "Show my briefing")
+        : h("button", { class: "cc-btn", onclick: function () { showTab("stacks"); } }, "Choose stacks")
     );
     body.appendChild(panel);
     var known = catalogStacks();
     var picks = POPULAR.map(function (id) { return known.filter(function (s) { return s.id === id; })[0]; }).filter(Boolean);
     if (picks.length) {
-      body.appendChild(h("p", { class: "sw-label" }, "Or start with a popular one"));
+      body.appendChild(h("p", { class: "sw-label" }, n ? "Add more" : "Or start with a popular one"));
       body.appendChild(h("div", { class: "sw-popular" }, picks.map(function (s) {
         var on = state.follows.indexOf(s.id) >= 0;
         return h("button", { class: "sw-chip", "aria-pressed": String(on), "aria-label": (on ? "Remove " : "Add ") + s.name,
           onclick: function () { toggleFollow(s.id); } }, icon(on ? "check" : "plus", 16), s.name);
       })));
-      if (state.follows.length) {
-        body.appendChild(h("p", { class: "sw-foot", style: "margin-bottom: 12px" }, "Following " + state.follows.length + ". Your first briefing covers the last 14 days."));
-        body.appendChild(h("div", { style: "padding: 0 16px 32px" },
-          h("button", { class: "cc-btn cc-block", onclick: function () { state.onboarding = false; renderToday(); } }, "Show my briefing")));
-      }
-    } else if (state.catalogStatus === "error") {
-      body.appendChild(h("p", { class: "sw-foot" }, "The list of stacks couldn't be loaded. Check your connection, then try again."));
     }
   }
 
@@ -447,12 +500,14 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     }
 
     var all = collect();
+    var remaining = all.fresh.filter(function (it) { return !record(it.id).done; });
+    var doneCount = all.fresh.length - remaining.length;
     var stacksInDay = {};
-    all.fresh.forEach(function (it) { stacksInDay[it.stackId] = true; });
+    remaining.forEach(function (it) { stacksInDay[it.stackId] = true; });
     var nStacks = Object.keys(stacksInDay).length;
-    sub.textContent = dateText + " · " + (all.fresh.length
-      ? all.fresh.length + (all.fresh.length === 1 ? " update" : " updates") + " across " + nStacks + (nStacks === 1 ? " stack" : " stacks")
-      : "nothing new yet");
+    sub.textContent = dateText + " · " + (remaining.length
+      ? remaining.length + (remaining.length === 1 ? " update" : " updates") + " across " + nStacks + (nStacks === 1 ? " stack" : " stacks")
+      : (doneCount ? "all done" : "nothing new yet")) + (doneCount ? " · " + doneCount + " done" : "");
 
     // Stack filter chips
     var followed = state.follows.map(stackById).sort(function (a, b) { return a.name.localeCompare(b.name); });
@@ -464,7 +519,9 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
           onclick: function () { state.filter = s.id; state.routineOpen = false; renderToday(); } }, s.name);
       })));
     }
-    var items = all.fresh.filter(function (it) { return state.filter === "all" || it.stackId === state.filter; });
+    var inView = all.fresh.filter(function (it) { return state.filter === "all" || it.stackId === state.filter; });
+    var items = inView.filter(function (it) { return !record(it.id).done; });
+    var doneItems = inView.filter(function (it) { return record(it.id).done; });
     var g = byGroup(items);
     var first = null;
 
@@ -479,12 +536,12 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       var names = [];
       g.routine.forEach(function (it) { var n = stackById(it.stackId).name; if (names.indexOf(n) < 0) names.push(n); });
       var fold = h("button", { class: "sw-fold", "aria-expanded": String(state.routineOpen),
-          onclick: function () { state.routineOpen = !state.routineOpen; renderToday(); } },
+          onclick: function () { state.routineOpen = !state.routineOpen; renderToday(); if (state.routineOpen) reveal("routine-updates"); } },
         h("span", { class: "sw-body" },
           h("span", { class: "sw-title" }, g.routine.length + (g.routine.length === 1 ? " routine update" : " routine updates")),
           h("span", { class: "sw-sum" }, "Minor and patch releases in " + list(names))),
         icon(state.routineOpen ? "chevron-up" : "chevron-down", 20));
-      var wrap = h("section", { class: "sw-section", "aria-label": "Routine updates", style: "margin-top: 24px" },
+      var wrap = h("section", { class: "sw-section", id: "routine-updates", "aria-label": "Routine updates", style: "margin-top: 24px" },
         h("div", { class: "sw-group" }, fold));
       body.appendChild(wrap);
       if (state.routineOpen) {
@@ -492,11 +549,27 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       }
     }
 
-    if (!items.length) {
+    if (doneItems.length) {
+      doneItems.sort(function (a, b) { return Date.parse(record(b.id).done) - Date.parse(record(a.id).done); });
+      var doneFold = h("button", { class: "sw-fold", "aria-expanded": String(state.doneOpen),
+          onclick: function () { state.doneOpen = !state.doneOpen; renderToday(); if (state.doneOpen) reveal("done-today"); } },
+        h("span", { class: "sw-body" },
+          h("span", { class: "sw-title" }, "Done today (" + doneItems.length + ")"),
+          h("span", { class: "sw-sum" }, "Open one to move it back to today")),
+        icon(state.doneOpen ? "chevron-up" : "chevron-down", 20));
+      var doneWrap = h("section", { class: "sw-section", id: "done-today", "aria-label": "Done today", style: "margin-top: 24px" },
+        h("div", { class: "sw-group" }, doneFold));
+      body.appendChild(doneWrap);
+      if (state.doneOpen) {
+        doneWrap.appendChild(h("ul", { class: "sw-group", style: "margin-top: 8px" }, doneItems.map(itemRow)));
+      }
+    }
+
+    if (!items.length && !doneItems.length) {
       body.appendChild(h("div", { class: "cc-empty sw-panel" },
         h("strong", null, state.filter === "all" ? "Nothing new in your stacks" : "Nothing new in " + stackById(state.filter).name),
         h("span", null, "New releases, advisories and posts show here as soon as the feed picks them up.")));
-      var earlier = byGroup(all.earlier.filter(function (it) { return state.filter === "all" || it.stackId === state.filter; }));
+      var earlier = byGroup(all.earlier.filter(function (it) { return (state.filter === "all" || it.stackId === state.filter) && !record(it.id).done; }));
       var earlierItems = earlier.act.concat(earlier.notable).slice(0, 8);
       if (earlierItems.length) body.appendChild(section("earlier", "Earlier this week", earlierItems, false));
     } else {
@@ -509,8 +582,15 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     window.appState = snapshot(first);
   }
 
+  // After a list opens, bring it on screen so what it shows is in view.
+  function reveal(id) {
+    var el = document.getElementById(id);
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" });
+  }
+
   function snapshot(firstGroup) {
-    return { follows: state.follows.slice(), firstGroup: firstGroup, status: state.status };
+    var done = Object.keys(state.items).filter(function (id) { return state.items[id].done; }).length;
+    return { follows: state.follows.slice(), firstGroup: firstGroup, status: state.status, done: done };
   }
 
   // --- detail ------------------------------------------------------------------------
@@ -527,11 +607,10 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 
   function showDetail(item) {
     state.current = item;
-    state.seen.opened = state.seen.opened || {};
-    state.seen.opened[item.id] = new Date().toISOString();
-    var ids = Object.keys(state.seen.opened);
-    if (ids.length > 300) ids.slice(0, ids.length - 300).forEach(function (k) { delete state.seen.opened[k]; });
-    saveSeen();
+    var rec = state.items[item.id] = state.items[item.id] || {};
+    if (!rec.opened) rec.opened = new Date().toISOString();
+    saveItems();
+    renderToday();
     var stack = stackById(item.stackId);
     var body = document.getElementById("detail-body");
     body.textContent = "";
@@ -545,6 +624,12 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
         h("div", { class: "sw-badges" }, badgeEls(item)),
         h("p", { class: "sw-meta", style: "margin:0" }, (item.kind === "release" ? "Released " : "Published ") + when + (site ? " · " + site : ""))
       ),
+      h("div", { class: "sw-actions" },
+        h("button", { class: "cc-btn cc-tinted cc-block", onclick: function () {
+          var done = !record(item.id).done;
+          popScreen();
+          markDone(item, done);
+        } }, rec.done ? "Move back to today" : "Mark as done")),
       item.summary ? h("section", { class: "sw-card", "aria-labelledby": "in-short" },
         h("h2", { id: "in-short" }, "In short"), h("p", null, item.summary)) : null,
       h("p", { class: "sw-why" }, icon("info", 18), h("span", null, "Why you're seeing this: " + whyText(item, stack))),
@@ -554,8 +639,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       item.url ? h("p", { class: "sw-hint" }, "Opens " + (site || "the source") + " in your browser") : null
     ));
     fillIcons(body);
-    if (window.ccUI && ccUI.push) ccUI.push("detail");
-    else { document.getElementById("today").hidden = true; document.getElementById("detail").hidden = false; }
+    pushScreen("detail");
   }
 
   document.getElementById("share").addEventListener("click", function () {
@@ -657,14 +741,26 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
         h("h2", { class: "sw-h2" }, "Following"),
         h("ul", { class: "sw-group" }, following.map(stackRow))));
     }
-    var cats = (state.cache.catalog.data.categories || []);
-    cats.forEach(function (c) {
-      var inCat = all.filter(function (s) { return s.category === c.id; });
-      if (!inCat.length) return;
+    var popular = POPULAR.map(function (id) { return all.filter(function (s) { return s.id === id; })[0]; })
+      .filter(function (s) { return s && state.follows.indexOf(s.id) < 0; });
+    if (popular.length) {
       body.appendChild(h("section", { class: "sw-section" },
-        h("h2", { class: "sw-h2" }, c.name),
-        h("ul", { class: "sw-group" }, inCat.map(stackRow))));
-    });
+        h("h2", { class: "sw-h2" }, "Popular"),
+        h("ul", { class: "sw-group" }, popular.map(stackRow))));
+    }
+    var cats = (state.cache.catalog.data.categories || []);
+    body.appendChild(h("section", { class: "sw-section" },
+      h("h2", { class: "sw-h2" }, "Browse"),
+      h("ul", { class: "sw-group sw-plain" }, cats.map(function (c) {
+        var inCat = all.filter(function (s) { return s.category === c.id; });
+        if (!inCat.length) return null;
+        var mine = inCat.filter(function (s) { return state.follows.indexOf(s.id) >= 0; }).length;
+        return h("li", null, h("button", { class: "sw-catrow", onclick: function () { showCategory(c.id); } },
+          h("span", { class: "sw-body" },
+            h("span", { class: "sw-row-name" }, c.name),
+            h("span", { class: "sw-meta" }, inCat.length + (inCat.length === 1 ? " stack" : " stacks") + (mine ? " · " + mine + " followed" : ""))),
+          icon("chevron-right", 20)));
+      }))));
     body.appendChild(h("p", { class: "sw-foot" }, "Missing a stack? ",
       h("a", { href: REQUEST_URL, target: "_blank", rel: "noopener noreferrer" }, "Request it")));
     fillIcons(body);
@@ -676,12 +772,72 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   });
   document.getElementById("refresh").addEventListener("click", function () { refresh(true); });
 
+  var currentTab = "today";
   function showTab(id) {
+    currentTab = id;
     if (window.ccUI && ccUI.tabs) ccUI.tabs().show(id);
     else ["today", "stacks"].forEach(function (s) { document.getElementById(s).hidden = s !== id; });
   }
 
-  function renderAll() { renderToday(); renderStacks(); }
+  function showCategory(id) {
+    state.category = id;
+    renderCategory();
+    pushScreen("category");
+  }
+
+  // Screens opened on top of a tab (an item, a category). The app moves between them itself,
+  // without animation, and puts you back where you were.
+  var navStack = [];
+  function visibleScreen() {
+    return [].filter.call(document.querySelectorAll("main.cc-screen"), function (m) { return !m.hidden; })[0];
+  }
+  function setScreen(id) {
+    [].forEach.call(document.querySelectorAll("main.cc-screen"), function (m) { m.hidden = m.id !== id; });
+  }
+  function pushScreen(id) {
+    var cur = visibleScreen();
+    navStack.push({ id: cur ? cur.id : currentTab, y: window.scrollY || 0 });
+    setScreen(id);
+    document.querySelector(".cc-tabbar").hidden = true;
+    window.scrollTo(0, 0);
+  }
+  function popScreen() {
+    var back = navStack.pop() || { id: currentTab, y: 0 };
+    setScreen(back.id);
+    if (!navStack.length) document.querySelector(".cc-tabbar").hidden = false;
+    window.scrollTo(0, back.y);
+  }
+  document.getElementById("detail-back").addEventListener("click", popScreen);
+  document.getElementById("category-back").addEventListener("click", popScreen);
+
+  function renderCategory() {
+    var body = document.getElementById("category-body");
+    var cat = ((state.cache.catalog && state.cache.catalog.data.categories) || []).filter(function (c) { return c.id === state.category; })[0];
+    body.textContent = "";
+    if (!cat) return;
+    document.getElementById("category-title").textContent = cat.name;
+    var inCat = catalogStacks().filter(function (s) { return s.category === cat.id; });
+    body.appendChild(h("section", { class: "sw-section", style: "margin-top: 8px" },
+      h("ul", { class: "sw-group" }, inCat.map(stackRow))));
+    body.appendChild(h("p", { class: "sw-foot" }, "Missing a stack? ",
+      h("a", { href: REQUEST_URL, target: "_blank", rel: "noopener noreferrer" }, "Request it")));
+    fillIcons(body);
+  }
+
+  // Tapping the tab you're already on goes back to the top.
+  Array.prototype.forEach.call(document.querySelectorAll("[data-cc-tab]"), function (tab) {
+    tab.addEventListener("click", function () {
+      var id = tab.getAttribute("data-cc-tab");
+      if (id === currentTab) {
+        window.scrollTo(0, 0);
+        var screen = document.getElementById(id);
+        if (screen) screen.scrollTop = 0;
+      }
+      currentTab = id;
+    }, true);
+  });
+
+  function renderAll() { renderToday(); renderStacks(); if (state.category) renderCategory(); }
 
   window.addEventListener("online", function () { refresh(false); });
   document.addEventListener("visibilitychange", function () {
